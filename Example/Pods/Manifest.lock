@@ -1,0 +1,33 @@
+PODS:
+  - GDChannel (0.6.0):
+    - MQTTKit (~> 0.1.0)
+    - Protobuf (~> 3.0)
+  - GDOperation (0.1.0):
+    - Protobuf (~> 3.0)
+  - MQTTKit (0.1.0)
+  - Protobuf (3.1.0)
+
+DEPENDENCIES:
+  - GDChannel (from `https://github.com/goodow/GDChannel.git`)
+  - GDOperation (from `../`)
+
+EXTERNAL SOURCES:
+  GDChannel:
+    :git: https://github.com/goodow/GDChannel.git
+  GDOperation:
+    :path: ../
+
+CHECKOUT OPTIONS:
+  GDChannel:
+    :commit: ce7cac9a3f08df28fa25bbb550d6d0e6859803ff
+    :git: https://github.com/goodow/GDChannel.git
+
+SPEC CHECKSUMS:
+  GDChannel: 188843d9ae255227f5a72fcc35ae7d048509682c
+  GDOperation: 36f5d1adeb0395a5a879d9eb235c5e1455dd1966
+  MQTTKit: a4e6b8aa92db1aeae917d2b773fd72a7749937c4
+  Protobuf: 265e9977d04a83eba9cefb0bed3ad07e41033b4a
+
+PODFILE CHECKSUM: 21e9d7c4e3b0067d02f511420953750f01ab83ff
+
+COCOAPODS: 1.0.1

@@ -30,13 +30,8 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'GDOperation/Classes/**/*'
-  
-  # s.resource_bundles = {
-  #   'GDOperation' => ['GDOperation/Assets/*.png']
-  # }
+  s.source_files = 'GDOperation/Classes/**/*', 'GDOperation/Generated/**/*'
+  s.requires_arc = ['GDOperation/Classes/**/*']
 
-  # s.public_header_files = 'Pod/Classes/**/*.h'
-  # s.frameworks = 'UIKit', 'MapKit'
-  # s.dependency 'AFNetworking', '~> 2.3'
+  s.dependency 'Protobuf', '~> 3.0'
 end

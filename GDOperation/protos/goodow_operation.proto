@@ -1,0 +1,73 @@
+syntax = "proto3";
+option objc_class_prefix = "GDOPB";
+package goodow.protobuf;
+
+// 样式的集合
+message Attribute {
+  /** Inline Formats **/
+  string color = 1; // "#cccccc", Uses six character hex values to represent colors and not RGB
+  string background = 2; // 背景色
+  string size = 3; // 字号
+  string font = 4; // 字体
+  string link = 5; // 链接
+  Bool bold = 6; // 粗体
+  Bool italic = 7; // 斜体
+  Bool underline = 8; // 下划线
+  Bool strike = 9; // 删除线
+  Bool code = 10;
+  Script script = 11;
+
+  /** 用于扩展自定义样式 **/
+  map<string, string> extras = 12;
+
+  /** Block Formats **/
+  Alignment align = 13; // 对齐方式
+
+  /** Embeds Formats **/
+  string width = 14;
+  string height = 15;
+
+  enum Bool {
+    DEFAULT_BOOL = 0; // 默认值
+    true = 1;
+    false = 2;
+  };
+
+  // 对齐方式, 作用于整行或一个段落
+  enum Alignment {
+    DEFAULT_ALIGNMENT = 0; // 默认值
+    left = 1; // 故意使用小写, 以使转换为 JSON 后的值为 'left'
+    center = 2;
+    right = 3;
+    justify = 4;
+  };
+
+  // 角标
+  enum Script {
+    DEFAULT_SCRIPT = 0; // 默认值
+    super = 1;
+    sub = 2;
+  };
+};
+
+// 非文本类型内容
+message Embed {
+  string image = 1;
+  string video = 2;
+};
+
+// 富文本片段
+message Operation {
+  string insert = 1; // 文本内容. 当值为换行符 '\n' 时, attributes 里的 Block Formats 将作用于之前的整行
+  Embed insert_embed = 2; // 非文本类型内容
+
+  int64 retain = 3; // 如 attributes 也存在, 可用于改变内容的样式
+  int64 delete = 4; // 先保留, 暂不实现
+
+  Attribute attributes = 5; // 样式
+};
+
+// 富文本数据模型
+message Delta {
+  repeated Operation ops = 1;
+};

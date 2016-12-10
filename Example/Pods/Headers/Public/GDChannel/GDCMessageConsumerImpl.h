@@ -1,0 +1,1 @@
+../../../GDChannel/Pod/Classes/Default Implementation/GDCMessageConsumerImpl.h

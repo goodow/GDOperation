@@ -1,0 +1,1 @@
+../../../GDChannel/Pod/Classes/Util/NSObject+GDChannel.h

@@ -1,0 +1,1 @@
+../../../GDChannel/Pod/Classes/GDCMessage.h

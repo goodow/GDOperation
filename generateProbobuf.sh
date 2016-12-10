@@ -1,0 +1,1 @@
+protoc --objc_out=GDOperation/Generated -IGDOperation/protos GDOperation/protos/goodow_operation.proto

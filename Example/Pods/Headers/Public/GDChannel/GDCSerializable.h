@@ -1,0 +1,1 @@
+../../../GDChannel/Pod/Classes/Data/GDCSerializable.h

@@ -1,0 +1,29 @@
+{
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "DD8F6C5B3E11FCB8D5EC33093A4AACF884DC1F5B" : 9223372036854775807,
+    "DE6820D04CEA6C98A329B32D1FCB6535CCFE5571" : 9223372036854775807
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "22D7DCDF-35A1-4FB9-A212-6946FFEA70A5",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "DD8F6C5B3E11FCB8D5EC33093A4AACF884DC1F5B" : "",
+    "DE6820D04CEA6C98A329B32D1FCB6535CCFE5571" : ".."
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "GDOperation",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Example\/GDOperation.xcworkspace",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/goodow\/realtime-operation.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "DD8F6C5B3E11FCB8D5EC33093A4AACF884DC1F5B"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/goodow\/realtime.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "DE6820D04CEA6C98A329B32D1FCB6535CCFE5571"
+    }
+  ]
+}
