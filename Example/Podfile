@@ -1,0 +1,14 @@
+use_frameworks!
+
+target 'GDOperation_Example' do
+  pod 'GDOperation', :path => '../'
+
+  target 'GDOperation_Tests' do
+    inherit! :search_paths
+
+    pod 'Specta'
+  pod 'Expecta'
+  pod 'FBSnapshotTestCase'
+  pod 'Expecta+Snapshots'
+  end
+end
