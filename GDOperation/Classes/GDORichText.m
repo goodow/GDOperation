@@ -18,6 +18,9 @@
   if (self) {
     _label = label;
     _attributedText = label.attributedText.mutableCopy;
+    if (!_attributedText.length) {
+      self.setText(@"\n");
+    }
   }
 
   return self;
@@ -26,7 +29,7 @@
 - (instancetype)init {
   self = [super init];
   if (self) {
-    _attributedText = [[NSMutableAttributedString alloc] init];
+    _attributedText = [[NSMutableAttributedString alloc] initWithString:@"\n"];
   }
 
   return self;
@@ -50,8 +53,11 @@
 
 - (GDOPBDelta *(^)(GDOPBDelta *delta))setContents {
   return ^GDOPBDelta *(GDOPBDelta *delta) {
-      [self.attributedText deleteCharactersInRange:NSMakeRange(0, self.attributedText.length)];
-      return self.updateContents(delta);
+      NSUInteger length = self.attributedText.length;
+      [self.attributedText deleteCharactersInRange:NSMakeRange(0, length)];
+      GDOPBDelta *contents = self.updateContents(delta);
+//      return contents.delete(length);
+      return nil;
   };
 }
 
@@ -64,10 +70,10 @@
 
 - (GDOPBDelta *(^)(NSString *text))setText {
   return ^GDOPBDelta *(NSString *text) {
-      text = [text hasSuffix:@"\n"] ? text : [text stringByAppendingString:@"\n"];
-      [self.attributedText replaceCharactersInRange:NSMakeRange(0, self.attributedText.length) withString:text];
+      NSUInteger length = self.attributedText.length;
+      [self.attributedText replaceCharactersInRange:NSMakeRange(0, length) withString:text];
       [self update];
-      return nil;
+      return [GDOPBDelta message].insert(text, nil).delete(length);
   };
 }
 
@@ -98,24 +104,34 @@
 
 - (GDOPBAttribute *(^)(NSRange range))getFormat {
   return ^GDOPBAttribute *(NSRange range) {
+      NSRange r;
+      NSDictionary<NSString *, id> *attr = [self.attributedText attributesAtIndex:range.location effectiveRange:&r];
+      if (r.length != range.length) {
+        return [self parseNSAttributes:attr];
+      }
       return NULL;
   };
 }
 
 - (GDOPBDelta *(^)(NSRange range, GDOPBAttribute *attributes))formatText {
   return ^GDOPBDelta *(NSRange range, GDOPBAttribute *attributes) {
+      NSDictionary<NSString *, id> *attr = [self parseInlineAttributes:attributes];
+      [self.attributedText addAttributes:attr range:range];
+      [self update];
       return nil;
   };
 }
 
 - (GDOPBDelta *(^)(NSRange range, GDOPBAttribute *attributes))formatLine {
   return ^GDOPBDelta *(NSRange range, GDOPBAttribute *attributes) {
+      [self update];
       return nil;
   };
 }
 
 - (GDOPBDelta *(^)(NSRange range))removeFormat {
   return ^GDOPBDelta *(NSRange range) {
+      [self update];
       return nil;
   };
 }
@@ -124,7 +140,7 @@
 
 - (void)apply:(GDOPBDelta *)delta {
   long cursor = 0;
-  for (GDOPBOperation *op in delta.opsArray) {
+  for (GDOPBDelta_Operation *op in delta.opsArray) {
     if (op.insert.length) {
       NSString *text = op.insert;
       if (![text isEqualToString:@"\n"]) {
@@ -138,7 +154,8 @@
         }
         NSMutableParagraphStyle *paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
         [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:text attributes:paragraphStyle] atIndex:cursor];
-        if ([self parseBlockAttributes:op.attributes style:paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init]]) {
+        paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
+        if ([self parseBlockAttributes:op.attributes style:paragraphStyle]) {
           [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
         }
       }
@@ -179,18 +196,17 @@
   }
 }
 
-
 - (NSDictionary<NSString *, id> *)parseInlineAttributes:(GDOPBAttribute *)attributes {
   NSMutableDictionary<NSString *, id> *attrs = @{}.mutableCopy;
   if (attributes.color.length) {
-    attrs[NSForegroundColorAttributeName] = [self _getColor:attributes.color];
+    attrs[NSForegroundColorAttributeName] = [self _colorFromHex:attributes.color];
   }
   if (attributes.background.length) {
-    attrs[NSBackgroundColorAttributeName] = [self _getColor:attributes.background];
+    attrs[NSBackgroundColorAttributeName] = [self _colorFromHex:attributes.background];
   }
   if (attributes.size.length || attributes.font.length) {
 //    UIFont *font = [self.attributedText attribute:NSFontAttributeName atIndex:<#(NSUInteger)location#> effectiveRange:nil];
-    UIFont *font = [UIFont fontWithName:attributes.font.length ? attributes.font : @"Helvetica" size:[self _getSize:attributes.size]];
+    UIFont *font = [UIFont fontWithName:attributes.font.length ? attributes.font : @"Helvetica" size:[self _sizeFromString:attributes.size]];
     attrs[NSFontAttributeName] = font;
   }
   if (attributes.link.length) {
@@ -206,7 +222,7 @@
     attrs[NSUnderlineStyleAttributeName] = @(attributes.underline == GDOPBAttribute_Bool_True ? NSUnderlineStyleSingle : NSUnderlineStyleNone);
   }
   if (attributes.strike) {
-    attrs[NSUnderlineStyleAttributeName] = @(attributes.strike == GDOPBAttribute_Bool_True ? NSUnderlineStyleSingle : NSUnderlineStyleNone);
+    attrs[NSStrikethroughStyleAttributeName] = @(attributes.strike == GDOPBAttribute_Bool_True ? NSUnderlineStyleSingle : NSUnderlineStyleNone);
   }
 
   return attrs;
@@ -242,26 +258,55 @@
   for (NSString *key in extras) {
     NSString *value = extras[key];
     if ([key isEqualToString:@"maximumLineHeight"]) {
-      paragraph.maximumLineHeight = [self _getSize:value];
+      paragraph.maximumLineHeight = [self _sizeFromString:value];
       hasChange = YES;
     } else if ([key isEqualToString:@"minimumLineHeight"]) {
-      paragraph.minimumLineHeight = [self _getSize:value];
+      paragraph.minimumLineHeight = [self _sizeFromString:value];
       hasChange = YES;
     } else if ([key isEqualToString:@"lineSpacing"]) {
-      paragraph.lineSpacing = [self _getSize:value];
+      paragraph.lineSpacing = [self _sizeFromString:value];
       hasChange = YES;
     } else if ([key isEqualToString:@"paragraphSpacing"]) {
-      paragraph.paragraphSpacing = [self _getSize:value];
+      paragraph.paragraphSpacing = [self _sizeFromString:value];
       hasChange = YES;
     } else if ([key isEqualToString:@"lineHeightMultiple"]) {
-      paragraph.lineHeightMultiple = [self _getSize:value];
+      paragraph.lineHeightMultiple = [self _sizeFromString:value];
       hasChange = YES;
     } else if ([key isEqualToString:@"paragraphSpacingBefore"]) {
-      paragraph.paragraphSpacingBefore = [self _getSize:value];
+      paragraph.paragraphSpacingBefore = [self _sizeFromString:value];
       hasChange = YES;
     }
   }
   return hasChange;
+}
+
+-(GDOPBAttribute *)parseNSAttributes:(NSDictionary<NSString *, id> *)attr {
+  GDOPBAttribute *attribute = [GDOPBAttribute message];
+  for (NSString *key in attr) {
+    if ([key isEqualToString:NSForegroundColorAttributeName]) {
+      UIColor *color = attr[key];
+      attribute.color = [self _hexFromColor:color];
+    } else if ([key isEqualToString:NSBackgroundColorAttributeName]) {
+      UIColor *background = attr[key];
+      attribute.background = [self _hexFromColor:background];
+    } else if ([key isEqualToString:NSFontAttributeName]) {
+      UIFont *font = attr[key];
+      attribute.size = [self _sizeStringFromNumber:font.pointSize];
+      attribute.font = [font.fontName isEqualToString:@"Helvetica"] ? nil : font.fontName;
+    } else if ([key isEqualToString:NSLinkAttributeName]) {
+      NSURL *url = attr[key];
+      attribute.link = url.absoluteString;
+    } else if ([key isEqualToString:NSExpansionAttributeName]) {
+      attribute.bold = GDOPBAttribute_Bool_True;
+    } else if ([key isEqualToString:NSObliquenessAttributeName]) {
+      attribute.italic = GDOPBAttribute_Bool_True;
+    } else if ([key isEqualToString:NSUnderlineStyleAttributeName]) {
+      attribute.underline = GDOPBAttribute_Bool_True;
+    } else if ([key isEqualToString:NSStrikethroughStyleAttributeName]) {
+      attribute.strike = GDOPBAttribute_Bool_True;
+    }
+  }
+  return attribute;
 }
 
 - (void)update {
@@ -270,7 +315,7 @@
   }
 }
 
-- (UIColor *)_getColor:(NSString *)hexString {
+- (UIColor *)_colorFromHex:(NSString *)hexString {
   unsigned hex;
   NSScanner *scanner = [NSScanner scannerWithString:hexString];
   [scanner setScanLocation:[hexString hasPrefix:@"#"] ? 1 : 0]; // bypass '#' character
@@ -279,11 +324,29 @@
       >> 8)) / 255.0      blue:((float) ((hex & 0x0000FF) >> 0)) / 255.0 alpha:1.0];
 }
 
-- (CGFloat)_getSize:(NSString *)size {
+- (NSString *)_hexFromColor:(UIColor *)color {
+  const CGFloat *components = CGColorGetComponents(color.CGColor);
+  CGFloat r = components[0];
+  CGFloat g = components[1];
+  CGFloat b = components[2];
+  return [NSString stringWithFormat:@"#%02lX%02lX%02lX",
+                                    lroundf(r * 255),
+                                    lroundf(g * 255),
+                                    lroundf(b * 255)];
+}
+
+- (CGFloat)_sizeFromString:(NSString *)size {
   CGFloat fontSize = 12;
   if ([size hasSuffix:@"px"]) {
     fontSize = [[size substringToIndex:size.length - @"px".length] floatValue];
   }
   return fontSize;
+}
+
+- (NSString *)_sizeStringFromNumber:(CGFloat)size {
+  if (size == 12) {
+    return nil;
+  }
+  return [NSString stringWithFormat:@"", size, @"px"];
 }
 @end

@@ -8,7 +8,7 @@
 
 - (GDOPBDelta *(^)(NSString *text, GDOPBAttribute *attributes))insert {
   return ^GDOPBDelta *(NSString *text, GDOPBAttribute *attributes) {
-      GDOPBOperation *op = [[GDOPBOperation alloc] init];
+      GDOPBDelta_Operation *op = [[GDOPBDelta_Operation alloc] init];
       op.insert = text;
       op.attributes = attributes;
       [self.opsArray addObject:op];
@@ -18,7 +18,7 @@
 
 - (GDOPBDelta *(^)(unsigned long long, GDOPBAttribute *))retain_p {
   return ^GDOPBDelta *(unsigned long long int length, GDOPBAttribute *attributes) {
-      GDOPBOperation *op = [[GDOPBOperation alloc] init];
+      GDOPBDelta_Operation *op = [[GDOPBDelta_Operation alloc] init];
       op.retain_p = length;
       op.attributes = attributes;
       [self.opsArray addObject:op];
@@ -28,7 +28,7 @@
 
 - (GDOPBDelta *(^)(unsigned long long))delete {
   return ^GDOPBDelta *(unsigned long long int length) {
-      GDOPBOperation *op = [[GDOPBOperation alloc] init];
+      GDOPBDelta_Operation *op = [[GDOPBDelta_Operation alloc] init];
       op.delete_p = length;
       [self.opsArray addObject:op];
       return self;

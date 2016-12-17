@@ -443,147 +443,6 @@ BOOL GDOPBAttribute_Script_IsValidValue(int32_t value__) {
   }
 }
 
-#pragma mark - GDOPBEmbed
-
-@implementation GDOPBEmbed
-
-@dynamic image;
-@dynamic video;
-
-typedef struct GDOPBEmbed__storage_ {
-  uint32_t _has_storage_[1];
-  NSString *image;
-  NSString *video;
-} GDOPBEmbed__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "image",
-        .dataTypeSpecific.className = NULL,
-        .number = GDOPBEmbed_FieldNumber_Image,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(GDOPBEmbed__storage_, image),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "video",
-        .dataTypeSpecific.className = NULL,
-        .number = GDOPBEmbed_FieldNumber_Video,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(GDOPBEmbed__storage_, video),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GDOPBEmbed class]
-                                     rootClass:[GDOPBGoodowOperationRoot class]
-                                          file:GDOPBGoodowOperationRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(GDOPBEmbed__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
-#pragma mark - GDOPBOperation
-
-@implementation GDOPBOperation
-
-@dynamic insert;
-@dynamic hasInsertEmbed, insertEmbed;
-@dynamic retain_p;
-@dynamic delete_p;
-@dynamic hasAttributes, attributes;
-
-typedef struct GDOPBOperation__storage_ {
-  uint32_t _has_storage_[1];
-  NSString *insert;
-  GDOPBEmbed *insertEmbed;
-  GDOPBAttribute *attributes;
-  int64_t retain_p;
-  int64_t delete_p;
-} GDOPBOperation__storage_;
-
-// This method is threadsafe because it is initially called
-// in +initialize for each subclass.
-+ (GPBDescriptor *)descriptor {
-  static GPBDescriptor *descriptor = nil;
-  if (!descriptor) {
-    static GPBMessageFieldDescription fields[] = {
-      {
-        .name = "insert",
-        .dataTypeSpecific.className = NULL,
-        .number = GDOPBOperation_FieldNumber_Insert,
-        .hasIndex = 0,
-        .offset = (uint32_t)offsetof(GDOPBOperation__storage_, insert),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeString,
-      },
-      {
-        .name = "insertEmbed",
-        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBEmbed),
-        .number = GDOPBOperation_FieldNumber_InsertEmbed,
-        .hasIndex = 1,
-        .offset = (uint32_t)offsetof(GDOPBOperation__storage_, insertEmbed),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
-      {
-        .name = "retain_p",
-        .dataTypeSpecific.className = NULL,
-        .number = GDOPBOperation_FieldNumber_Retain_p,
-        .hasIndex = 2,
-        .offset = (uint32_t)offsetof(GDOPBOperation__storage_, retain_p),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt64,
-      },
-      {
-        .name = "delete_p",
-        .dataTypeSpecific.className = NULL,
-        .number = GDOPBOperation_FieldNumber_Delete_p,
-        .hasIndex = 3,
-        .offset = (uint32_t)offsetof(GDOPBOperation__storage_, delete_p),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeInt64,
-      },
-      {
-        .name = "attributes",
-        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBAttribute),
-        .number = GDOPBOperation_FieldNumber_Attributes,
-        .hasIndex = 4,
-        .offset = (uint32_t)offsetof(GDOPBOperation__storage_, attributes),
-        .flags = GPBFieldOptional,
-        .dataType = GPBDataTypeMessage,
-      },
-    };
-    GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GDOPBOperation class]
-                                     rootClass:[GDOPBGoodowOperationRoot class]
-                                          file:GDOPBGoodowOperationRoot_FileDescriptor()
-                                        fields:fields
-                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(GDOPBOperation__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    NSAssert(descriptor == nil, @"Startup recursed!");
-    descriptor = localDescriptor;
-  }
-  return descriptor;
-}
-
-@end
-
 #pragma mark - GDOPBDelta
 
 @implementation GDOPBDelta
@@ -603,7 +462,7 @@ typedef struct GDOPBDelta__storage_ {
     static GPBMessageFieldDescription fields[] = {
       {
         .name = "opsArray",
-        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBOperation),
+        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBDelta_Operation),
         .number = GDOPBDelta_FieldNumber_OpsArray,
         .hasIndex = GPBNoHasBit,
         .offset = (uint32_t)offsetof(GDOPBDelta__storage_, opsArray),
@@ -619,6 +478,149 @@ typedef struct GDOPBDelta__storage_ {
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBDelta__storage_)
                                          flags:GPBDescriptorInitializationFlag_None];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - GDOPBDelta_Operation
+
+@implementation GDOPBDelta_Operation
+
+@dynamic insert;
+@dynamic hasInsertEmbed, insertEmbed;
+@dynamic retain_p;
+@dynamic delete_p;
+@dynamic hasAttributes, attributes;
+
+typedef struct GDOPBDelta_Operation__storage_ {
+  uint32_t _has_storage_[1];
+  NSString *insert;
+  GDOPBDelta_Embed *insertEmbed;
+  GDOPBAttribute *attributes;
+  uint64_t retain_p;
+  uint64_t delete_p;
+} GDOPBDelta_Operation__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "insert",
+        .dataTypeSpecific.className = NULL,
+        .number = GDOPBDelta_Operation_FieldNumber_Insert,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation__storage_, insert),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "insertEmbed",
+        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBDelta_Embed),
+        .number = GDOPBDelta_Operation_FieldNumber_InsertEmbed,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation__storage_, insertEmbed),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+      {
+        .name = "retain_p",
+        .dataTypeSpecific.className = NULL,
+        .number = GDOPBDelta_Operation_FieldNumber_Retain_p,
+        .hasIndex = 2,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation__storage_, retain_p),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeUInt64,
+      },
+      {
+        .name = "delete_p",
+        .dataTypeSpecific.className = NULL,
+        .number = GDOPBDelta_Operation_FieldNumber_Delete_p,
+        .hasIndex = 3,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation__storage_, delete_p),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeUInt64,
+      },
+      {
+        .name = "attributes",
+        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBAttribute),
+        .number = GDOPBDelta_Operation_FieldNumber_Attributes,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation__storage_, attributes),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeMessage,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[GDOPBDelta_Operation class]
+                                     rootClass:[GDOPBGoodowOperationRoot class]
+                                          file:GDOPBGoodowOperationRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(GDOPBDelta_Operation__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    [localDescriptor setupContainingMessageClassName:GPBStringifySymbol(GDOPBDelta)];
+    NSAssert(descriptor == nil, @"Startup recursed!");
+    descriptor = localDescriptor;
+  }
+  return descriptor;
+}
+
+@end
+
+#pragma mark - GDOPBDelta_Embed
+
+@implementation GDOPBDelta_Embed
+
+@dynamic image;
+@dynamic video;
+
+typedef struct GDOPBDelta_Embed__storage_ {
+  uint32_t _has_storage_[1];
+  NSString *image;
+  NSString *video;
+} GDOPBDelta_Embed__storage_;
+
+// This method is threadsafe because it is initially called
+// in +initialize for each subclass.
++ (GPBDescriptor *)descriptor {
+  static GPBDescriptor *descriptor = nil;
+  if (!descriptor) {
+    static GPBMessageFieldDescription fields[] = {
+      {
+        .name = "image",
+        .dataTypeSpecific.className = NULL,
+        .number = GDOPBDelta_Embed_FieldNumber_Image,
+        .hasIndex = 0,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Embed__storage_, image),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "video",
+        .dataTypeSpecific.className = NULL,
+        .number = GDOPBDelta_Embed_FieldNumber_Video,
+        .hasIndex = 1,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Embed__storage_, video),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
+      },
+    };
+    GPBDescriptor *localDescriptor =
+        [GPBDescriptor allocDescriptorForClass:[GDOPBDelta_Embed class]
+                                     rootClass:[GDOPBGoodowOperationRoot class]
+                                          file:GDOPBGoodowOperationRoot_FileDescriptor()
+                                        fields:fields
+                                    fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
+                                   storageSize:sizeof(GDOPBDelta_Embed__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    [localDescriptor setupContainingMessageClassName:GPBStringifySymbol(GDOPBDelta)];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

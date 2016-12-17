@@ -28,8 +28,8 @@
 CF_EXTERN_C_BEGIN
 
 @class GDOPBAttribute;
-@class GDOPBEmbed;
-@class GDOPBOperation;
+@class GDOPBDelta_Embed;
+@class GDOPBDelta_Operation;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -278,60 +278,6 @@ int32_t GDOPBAttribute_Align_RawValue(GDOPBAttribute *message);
  **/
 void SetGDOPBAttribute_Align_RawValue(GDOPBAttribute *message, int32_t value);
 
-#pragma mark - GDOPBEmbed
-
-typedef GPB_ENUM(GDOPBEmbed_FieldNumber) {
-  GDOPBEmbed_FieldNumber_Image = 1,
-  GDOPBEmbed_FieldNumber_Video = 2,
-};
-
-/**
- * 非文本类型内容
- **/
-@interface GDOPBEmbed : GPBMessage
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *image;
-
-@property(nonatomic, readwrite, copy, null_resettable) NSString *video;
-
-@end
-
-#pragma mark - GDOPBOperation
-
-typedef GPB_ENUM(GDOPBOperation_FieldNumber) {
-  GDOPBOperation_FieldNumber_Insert = 1,
-  GDOPBOperation_FieldNumber_InsertEmbed = 2,
-  GDOPBOperation_FieldNumber_Retain_p = 3,
-  GDOPBOperation_FieldNumber_Delete_p = 4,
-  GDOPBOperation_FieldNumber_Attributes = 5,
-};
-
-/**
- * 富文本片段
- **/
-@interface GDOPBOperation : GPBMessage
-
-/** 文本内容. 当值为换行符 '\\n' 时, attributes 里的 Block Formats 将作用于之前的整行 */
-@property(nonatomic, readwrite, copy, null_resettable) NSString *insert;
-
-/** 非文本类型内容 */
-@property(nonatomic, readwrite, strong, null_resettable) GDOPBEmbed *insertEmbed;
-/** Test to see if @c insertEmbed has been set. */
-@property(nonatomic, readwrite) BOOL hasInsertEmbed;
-
-/** 如 attributes 也存在, 可用于改变内容的样式 */
-@property(nonatomic, readwrite) int64_t retain_p;
-
-/** 先保留, 暂不实现 */
-@property(nonatomic, readwrite) int64_t delete_p;
-
-/** 样式 */
-@property(nonatomic, readwrite, strong, null_resettable) GDOPBAttribute *attributes;
-/** Test to see if @c attributes has been set. */
-@property(nonatomic, readwrite) BOOL hasAttributes;
-
-@end
-
 #pragma mark - GDOPBDelta
 
 typedef GPB_ENUM(GDOPBDelta_FieldNumber) {
@@ -343,9 +289,63 @@ typedef GPB_ENUM(GDOPBDelta_FieldNumber) {
  **/
 @interface GDOPBDelta : GPBMessage
 
-@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GDOPBOperation*> *opsArray;
+@property(nonatomic, readwrite, strong, null_resettable) NSMutableArray<GDOPBDelta_Operation*> *opsArray;
 /** The number of items in @c opsArray without causing the array to be created. */
 @property(nonatomic, readonly) NSUInteger opsArray_Count;
+
+@end
+
+#pragma mark - GDOPBDelta_Operation
+
+typedef GPB_ENUM(GDOPBDelta_Operation_FieldNumber) {
+  GDOPBDelta_Operation_FieldNumber_Insert = 1,
+  GDOPBDelta_Operation_FieldNumber_InsertEmbed = 2,
+  GDOPBDelta_Operation_FieldNumber_Retain_p = 3,
+  GDOPBDelta_Operation_FieldNumber_Delete_p = 4,
+  GDOPBDelta_Operation_FieldNumber_Attributes = 5,
+};
+
+/**
+ * 富文本片段
+ **/
+@interface GDOPBDelta_Operation : GPBMessage
+
+/** 文本内容. 当值为换行符 '\\n' 时, attributes 里的 Block Formats 将作用于之前的整行 */
+@property(nonatomic, readwrite, copy, null_resettable) NSString *insert;
+
+/** 非文本类型内容 */
+@property(nonatomic, readwrite, strong, null_resettable) GDOPBDelta_Embed *insertEmbed;
+/** Test to see if @c insertEmbed has been set. */
+@property(nonatomic, readwrite) BOOL hasInsertEmbed;
+
+/** 如 attributes 也存在, 可用于改变内容的样式 */
+@property(nonatomic, readwrite) uint64_t retain_p;
+
+/** 先保留, 暂不实现 */
+@property(nonatomic, readwrite) uint64_t delete_p;
+
+/** 样式 */
+@property(nonatomic, readwrite, strong, null_resettable) GDOPBAttribute *attributes;
+/** Test to see if @c attributes has been set. */
+@property(nonatomic, readwrite) BOOL hasAttributes;
+
+@end
+
+#pragma mark - GDOPBDelta_Embed
+
+typedef GPB_ENUM(GDOPBDelta_Embed_FieldNumber) {
+  GDOPBDelta_Embed_FieldNumber_Image = 1,
+  GDOPBDelta_Embed_FieldNumber_Video = 2,
+};
+
+/**
+ * 非文本类型内容
+ **/
+@interface GDOPBDelta_Embed : GPBMessage
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *image;
+
+@property(nonatomic, readwrite, copy, null_resettable) NSString *video;
 
 @end
 
