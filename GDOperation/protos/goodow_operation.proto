@@ -69,5 +69,6 @@ message Delta {
   message Embed {
     string image = 1;
     string video = 2;
+    bool space = 3;
   };
 };

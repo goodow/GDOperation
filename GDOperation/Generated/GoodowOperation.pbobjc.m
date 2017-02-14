@@ -580,6 +580,7 @@ typedef struct GDOPBDelta_Operation__storage_ {
 
 @dynamic image;
 @dynamic video;
+@dynamic space;
 
 typedef struct GDOPBDelta_Embed__storage_ {
   uint32_t _has_storage_[1];
@@ -610,6 +611,15 @@ typedef struct GDOPBDelta_Embed__storage_ {
         .offset = (uint32_t)offsetof(GDOPBDelta_Embed__storage_, video),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
+      },
+      {
+        .name = "space",
+        .dataTypeSpecific.className = NULL,
+        .number = GDOPBDelta_Embed_FieldNumber_Space,
+        .hasIndex = 2,
+        .offset = 3,  // Stored in _has_storage_ to save space.
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeBool,
       },
     };
     GPBDescriptor *localDescriptor =

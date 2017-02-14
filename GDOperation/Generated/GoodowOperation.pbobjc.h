@@ -310,7 +310,7 @@ typedef GPB_ENUM(GDOPBDelta_Operation_FieldNumber) {
  **/
 @interface GDOPBDelta_Operation : GPBMessage
 
-/** 文本内容. 当值为换行符 '\\n' 时, attributes 里的 Block Formats 将作用于之前的整行 */
+/** 文本内容. 当值为换行符 '\\n' 时, attributes(忽略非 Block Formats) 表示段落的样式 */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *insert;
 
 /** 非文本类型内容 */
@@ -336,6 +336,7 @@ typedef GPB_ENUM(GDOPBDelta_Operation_FieldNumber) {
 typedef GPB_ENUM(GDOPBDelta_Embed_FieldNumber) {
   GDOPBDelta_Embed_FieldNumber_Image = 1,
   GDOPBDelta_Embed_FieldNumber_Video = 2,
+  GDOPBDelta_Embed_FieldNumber_Space = 3,
 };
 
 /**
@@ -346,6 +347,8 @@ typedef GPB_ENUM(GDOPBDelta_Embed_FieldNumber) {
 @property(nonatomic, readwrite, copy, null_resettable) NSString *image;
 
 @property(nonatomic, readwrite, copy, null_resettable) NSString *video;
+
+@property(nonatomic, readwrite) BOOL space;
 
 @end
 
