@@ -190,7 +190,23 @@
     }
 
     if (op.hasInsertEmbed) {
-      cursor += 1;
+      if (op.insertEmbed.space) {
+        float spacing = op.attributes.width.floatValue; // 间隔
+        if (spacing > 0) {
+          unichar objectReplacementChar = 0xFFFC;
+          NSAttributedString * placeholder = [[NSAttributedString alloc] initWithString:[NSString stringWithCharacters:&objectReplacementChar length:1] attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:0]}];
+          [self.attributedText insertAttributedString:placeholder atIndex:cursor];
+          
+          [self.attributedText addAttribute:NSKernAttributeName
+                                      value:@(spacing)
+                                      range:NSMakeRange(cursor, 1)];
+          cursor += 1;
+        }
+        
+      } else {
+        // other implementation
+//        cursor += 1;
+      }
       continue;
     }
   }
