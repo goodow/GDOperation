@@ -28,6 +28,9 @@
   "dependencies": {
     "Protobuf": [
       "~> 3.0"
+    ],
+    "GDChannel": [
+
     ]
   }
 }

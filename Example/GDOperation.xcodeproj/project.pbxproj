@@ -23,6 +23,8 @@
 		6003F5B1195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F5B2195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
 		61FBC56772DADF8CE6455F1A /* GDOModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 61FBC4C0FDD71D22EF8C7F54 /* GDOModel.m */; };
+		8073E3B21E5BFC7B005322F1 /* GDOTextViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8073E3B01E5BFC7B005322F1 /* GDOTextViewTableViewCell.m */; };
+		8073E3B31E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8073E3B11E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -65,6 +67,10 @@
 		74A3BB7A0AA1A5D68470D04A /* Pods-GDOperation_Example.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GDOperation_Example.debug.xcconfig"; path = "Pods/Target Support Files/Pods-GDOperation_Example/Pods-GDOperation_Example.debug.xcconfig"; sourceTree = "<group>"; };
 		76F65DE9D9ED2F5743E24BCD /* Pods-GDOperation_Example.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-GDOperation_Example.release.xcconfig"; path = "Pods/Target Support Files/Pods-GDOperation_Example/Pods-GDOperation_Example.release.xcconfig"; sourceTree = "<group>"; };
 		7ACE1AC4656D50EC8E63BE45 /* LICENSE */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = LICENSE; path = ../LICENSE; sourceTree = "<group>"; };
+		8073E3AF1E5BFC7B005322F1 /* GDOTextViewTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDOTextViewTableViewCell.h; sourceTree = "<group>"; };
+		8073E3B01E5BFC7B005322F1 /* GDOTextViewTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDOTextViewTableViewCell.m; sourceTree = "<group>"; };
+		8073E3B11E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GDOTextViewTableViewCell.xib; sourceTree = "<group>"; };
+		8073E3B41E5BFDEF005322F1 /* GDOTableViewCellProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDOTableViewCellProtocol.h; sourceTree = "<group>"; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		F3732917EA64F8E8134D4BBC /* GDOperation.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = GDOperation.podspec; path = ../GDOperation.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -144,6 +150,10 @@
 				462BDECE1DFBFFC1009443C1 /* GDOTableViewCell.xib */,
 				61FBC4C0FDD71D22EF8C7F54 /* GDOModel.m */,
 				61FBCEF7F4FAC67CB0DEA787 /* GDOModel.h */,
+				8073E3AF1E5BFC7B005322F1 /* GDOTextViewTableViewCell.h */,
+				8073E3B01E5BFC7B005322F1 /* GDOTextViewTableViewCell.m */,
+				8073E3B11E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib */,
+				8073E3B41E5BFDEF005322F1 /* GDOTableViewCellProtocol.h */,
 			);
 			name = "Example for GDOperation";
 			path = GDOperation;
@@ -206,12 +216,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6003F5C2195388D20070C39A /* Build configuration list for PBXNativeTarget "GDOperation_Tests" */;
 			buildPhases = (
-				B60F51ADEBB4AAAFE2DBF609 /* [CP] Check Pods Manifest.lock */,
 				6003F5AA195388D20070C39A /* Sources */,
 				6003F5AB195388D20070C39A /* Frameworks */,
 				6003F5AC195388D20070C39A /* Resources */,
-				D730CE1DBD5B037B9F62B826 /* [CP] Embed Pods Frameworks */,
-				8D7A1CFF055F92588D0FC46D /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -267,6 +274,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */,
+				8073E3B31E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib in Resources */,
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,
 				462BDED01DFBFFC1009443C1 /* GDOTableViewCell.xib in Resources */,
 				6003F598195388D20070C39A /* InfoPlist.strings in Resources */,
@@ -295,7 +303,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
 		5D557A3561416F331665158B /* [CP] Copy Pods Resources */ = {
@@ -311,51 +319,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GDOperation_Example/Pods-GDOperation_Example-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8D7A1CFF055F92588D0FC46D /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GDOperation_Tests/Pods-GDOperation_Tests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		B60F51ADEBB4AAAFE2DBF609 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
-			showEnvVarsInLog = 0;
-		};
-		D730CE1DBD5B037B9F62B826 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-GDOperation_Tests/Pods-GDOperation_Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		EB9D305C4612D8538EC0C19B /* [CP] Embed Pods Frameworks */ = {
@@ -384,6 +347,7 @@
 				6003F59E195388D20070C39A /* GDOAppDelegate.m in Sources */,
 				462BDECB1DFBFF22009443C1 /* GDOTableViewController.m in Sources */,
 				6003F5A7195388D20070C39A /* GDOViewController.m in Sources */,
+				8073E3B21E5BFC7B005322F1 /* GDOTextViewTableViewCell.m in Sources */,
 				6003F59A195388D20070C39A /* main.m in Sources */,
 				61FBC56772DADF8CE6455F1A /* GDOModel.m in Sources */,
 			);

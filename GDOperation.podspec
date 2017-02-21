@@ -34,4 +34,5 @@ TODO: Add long description of the pod here.
   s.requires_arc = ['GDOperation/Classes/**/*']
 
   s.dependency 'Protobuf', '~> 3.0'
+  s.dependency 'GDChannel'
 end

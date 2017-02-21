@@ -10,6 +10,7 @@
 #import "GDOTableViewCell.h"
 #import "GDOModel.h"
 #import "NSObject+GDChannel.h"
+#import "GDOTextViewTableViewCell.h"
 
 @interface GDOTableViewController ()
 @property (strong, nonatomic) GDOModel *model;
@@ -36,6 +37,7 @@
 
   self.tableView.allowsSelection = NO;
   [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass(GDOTableViewCell.class) bundle:nil] forCellReuseIdentifier:NSStringFromClass(GDOTableViewCell.class)];
+  [self.tableView registerNib:[UINib nibWithNibName:NSStringFromClass(GDOTextViewTableViewCell.class) bundle:nil] forCellReuseIdentifier:NSStringFromClass(GDOTextViewTableViewCell.class)];
 
   // Self-sizing table view cells in iOS 8 require that the rowHeight property of the table view be set to the constant UITableViewAutomaticDimension
   self.tableView.rowHeight = UITableViewAutomaticDimension;
@@ -57,7 +59,12 @@
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-  GDOTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(GDOTableViewCell.class) forIndexPath:indexPath];
+  UITableViewCell <GDOTableViewCellProtocol> *cell;
+  if (indexPath.row == 0) {
+    cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(GDOTableViewCell.class) forIndexPath:indexPath];
+  } else {
+    cell = [tableView dequeueReusableCellWithIdentifier:NSStringFromClass(GDOTextViewTableViewCell.class) forIndexPath:indexPath];
+  }
 
   // Configure the cell for this indexPath
   [cell applyPatch:self.model.dataSource[indexPath.row]];

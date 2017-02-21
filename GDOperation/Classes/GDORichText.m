@@ -5,13 +5,16 @@
 #import "GDORichText.h"
 #import <UIKit/NSAttributedString.h>
 #import <UIKit/NSParagraphStyle.h>
+#import "NSObject+GDChannel.h"
+#import "GDCBusProvider.h"
 
-@interface GDORichText ()
+@interface GDORichText () <UITextViewDelegate>
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
 @end
 
 @implementation GDORichText {
   UILabel *_label;
+  UITextView *_textView;
 }
 - (instancetype)initWithLabel:(UILabel *)label {
   self = [super init];
@@ -23,6 +26,19 @@
     }
   }
 
+  return self;
+}
+
+- (instancetype)initWithTextView:(UITextView *)textView {
+  self = [super init];
+  if (self) {
+    _textView = textView;
+    _textView.delegate = self;
+    _attributedText = textView.attributedText.mutableCopy;
+    if (!_attributedText.length) {
+      self.setText(@"\n");
+    }
+  }
   return self;
 }
 
@@ -144,15 +160,22 @@
     if (op.insert.length) {
       NSString *text = op.insert;
       if (![text isEqualToString:@"\n"]) {
-        NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:[self parseInlineAttributes:op.attributes]];
+        NSDictionary *attr = [self parseInlineAttributes:op.attributes];
+        NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:attr];
         [self.attributedText insertAttributedString:str atIndex:cursor];
+        if (op.attributes.link.length) {
+          _textView.linkTextAttributes = attr;
+        }
       } else {
         NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
         long lineStart = 0;
         if (range.location != NSNotFound) {
           lineStart = range.location + 1;
         }
-        NSMutableParagraphStyle *paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
+        NSMutableParagraphStyle *paragraphStyle;
+        if (cursor) {
+          paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
+        }
         [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:text attributes:paragraphStyle] atIndex:cursor];
         paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
         if ([self parseBlockAttributes:op.attributes style:paragraphStyle]) {
@@ -196,7 +219,6 @@
           unichar objectReplacementChar = 0xFFFC;
           NSAttributedString * placeholder = [[NSAttributedString alloc] initWithString:[NSString stringWithCharacters:&objectReplacementChar length:1] attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:0]}];
           [self.attributedText insertAttributedString:placeholder atIndex:cursor];
-          
           [self.attributedText addAttribute:NSKernAttributeName
                                       value:@(spacing)
                                       range:NSMakeRange(cursor, 1)];
@@ -329,6 +351,9 @@
   if (_label) {
     _label.attributedText = self.attributedText;
   }
+  if (_textView) {
+    _textView.attributedText = self.attributedText;
+  }
 }
 
 - (UIColor *)_colorFromHex:(NSString *)hexString {
@@ -365,4 +390,13 @@
   }
   return [NSString stringWithFormat:@"", size, @"px"];
 }
+
+#pragma mark - UITextViewDelegate
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
+  NSString *clientId = [GDCBusProvider clientId];
+  NSString *topic = [NSString stringWithFormat:@"%@/action/views", clientId];
+  [self.bus publishLocal:topic payload:URL.absoluteString];
+  return NO;
+}
+
 @end

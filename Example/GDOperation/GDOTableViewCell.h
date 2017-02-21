@@ -7,11 +7,10 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "GDOTableViewCellProtocol.h"
 
 @class GDOPBDelta;
 
-@interface GDOTableViewCell : UITableViewCell
-
-- (void)applyPatch:(GDOPBDelta *)delta;
+@interface GDOTableViewCell : UITableViewCell <GDOTableViewCellProtocol>
 
 @end

@@ -11,6 +11,7 @@
 @interface GDORichText : NSObject
 
 - (instancetype)initWithLabel:(UILabel *)label;
+- (instancetype)initWithTextView:(UITextView *)textView;
 
 #pragma mark - Content
 

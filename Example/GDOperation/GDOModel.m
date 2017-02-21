@@ -20,6 +20,13 @@
 //        .setSize(@"22px");
     delta.insert(@"Label", attribute);
     _dataSource[0] = delta;
+    
+    GDOPBDelta *linkDelta = [GDOPBDelta message];
+    GDOPBAttribute *linkDeltaAttribute = [GDOPBAttribute message]
+    .setLink(@"http://www.baidu.com");
+    //        .setSize(@"22px");
+    linkDelta.insert(@"Baidu", linkDeltaAttribute);
+    _dataSource[1] = linkDelta;
   }
 
   return self;
