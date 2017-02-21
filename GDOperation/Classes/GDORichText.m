@@ -7,15 +7,17 @@
 #import <UIKit/NSParagraphStyle.h>
 #import "NSObject+GDChannel.h"
 #import "GDCBusProvider.h"
+#import "UITextView+GDORichText.h"
 
 @interface GDORichText () <UITextViewDelegate>
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
+@property(nonatomic, weak) UILabel *label;
+@property(nonatomic, weak) UITextView *textView;
 @end
 
 @implementation GDORichText {
-  UILabel *_label;
-  UITextView *_textView;
 }
+
 - (instancetype)initWithLabel:(UILabel *)label {
   self = [super init];
   if (self) {
@@ -34,6 +36,7 @@
   if (self) {
     _textView = textView;
     _textView.delegate = self;
+    _textView.richText = self;
     _attributedText = textView.attributedText.mutableCopy;
     if (!_attributedText.length) {
       self.setText(@"\n");

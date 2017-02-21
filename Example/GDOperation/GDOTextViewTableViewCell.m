@@ -14,7 +14,7 @@
 @end
 
 @implementation GDOTextViewTableViewCell {
-  GDORichText *_richText;
+
 }
 
 - (void)awakeFromNib {
@@ -24,8 +24,7 @@
 }
 
 - (void)applyPatch:(GDOPBDelta *)delta {
-  _richText = [[GDORichText alloc] initWithTextView:_textView]; // 强引用，不然textView的回调不起作用
-  _richText.updateContents(delta);
+  [[GDORichText alloc] initWithTextView:_textView].updateContents(delta);
 }
 
 @end
