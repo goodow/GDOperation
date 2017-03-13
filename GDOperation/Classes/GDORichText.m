@@ -416,4 +416,11 @@
   return NO;
 }
 
+- (void)textViewDidChangeSelection:(UITextView *)textView {
+  // 该方法禁止textView被select时的高亮（因为[textView:shouldInteractWithURL:inRange:]方法必须在textView是selectable时生效）
+  if(!NSEqualRanges(textView.selectedRange, NSMakeRange(0, 0))) {
+    textView.selectedRange = NSMakeRange(0, 0);
+  }
+}
+
 @end
