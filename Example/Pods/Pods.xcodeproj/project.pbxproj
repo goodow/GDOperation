@@ -102,7 +102,6 @@
 		98234DF1294DB8662E3C39306A81E4D9 /* GPBDictionary.m in Sources */ = {isa = PBXBuildFile; fileRef = 01958FF5CEF84B10AC889BA77B96EB24 /* GPBDictionary.m */; settings = {COMPILER_FLAGS = "-fno-objc-arc"; }; };
 		9890AB68848A4AE165A9A1D008544EB6 /* GDCBusProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 88D6EE55795ECE15FD34508FB5D1C0AF /* GDCBusProvider.m */; };
 		99B68FD4BCD8F23F84B6EE10AB8A1685 /* config.h in Headers */ = {isa = PBXBuildFile; fileRef = 9913A8E75AED1A84CBA1E734AD70E38F /* config.h */; settings = {ATTRIBUTES = (Project, ); }; };
-		9B725A5AC2BD3A747F4C16674906DE90 /* ReplaceMe.m in Sources */ = {isa = PBXBuildFile; fileRef = 6AED8264C7B39D6A23859A0B2C34ECF3 /* ReplaceMe.m */; };
 		9C741B78D8E17F1B058DC27943403C4D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBB3DE36805AF21409EC968A9691732F /* Foundation.framework */; };
 		9FC12262744AF41FE59CC655301BCEC5 /* GDCSerializable.h in Headers */ = {isa = PBXBuildFile; fileRef = C3EF611BFA23A9B99B7BFEDDE696B05C /* GDCSerializable.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A0E3AE533CC98740BF583EF07F30A1F7 /* GPBExtensionRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = A3B9465735A79134557E95EC25DFA040 /* GPBExtensionRegistry.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -292,7 +291,6 @@
 		6530F66D90808B7AE8A4FF12C472AB1C /* GPBProtocolBuffers.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = GPBProtocolBuffers.h; path = objectivec/GPBProtocolBuffers.h; sourceTree = "<group>"; };
 		65A87F6E05FAAE2A798D43035CCCF766 /* send_mosq.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = send_mosq.h; path = libmosquitto/send_mosq.h; sourceTree = "<group>"; };
 		6663738FBA026E06F6ED09054710FD74 /* Struct.pbobjc.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = Struct.pbobjc.m; path = objectivec/google/protobuf/Struct.pbobjc.m; sourceTree = "<group>"; };
-		6AED8264C7B39D6A23859A0B2C34ECF3 /* ReplaceMe.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; path = ReplaceMe.m; sourceTree = "<group>"; };
 		6F7F474DAE7F4D87219F873215E5DAC2 /* libProtobuf.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; name = libProtobuf.a; path = libProtobuf.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		703CF56A4FF48922580B617417176F3E /* Channel.pbobjc.h */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.h; name = Channel.pbobjc.h; path = Pod/Generated/goodow/channel/Channel.pbobjc.h; sourceTree = "<group>"; };
 		70861DA63A0820CF49D9DDE862B5ADCC /* GDCTopicsManager.m */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.c.objc; name = GDCTopicsManager.m; path = Pod/Classes/MQTT/GDCTopicsManager.m; sourceTree = "<group>"; };
@@ -665,7 +663,6 @@
 				7C268A957366F6985CC3F89B4C10B1C6 /* GDOPBDelta+GDOperation.m */,
 				A9E24FD955BD9EB01A58929B5CE59E07 /* GDORichText.h */,
 				213209A0CFD18021A8DF088D153449D8 /* GDORichText.m */,
-				6AED8264C7B39D6A23859A0B2C34ECF3 /* ReplaceMe.m */,
 				0C85B04A5A522606BE4C3653A00896E3 /* UITextView+GDORichText.h */,
 				5CCCD1CB8BF45ADBC76EAA7AD9F330C5 /* UITextView+GDORichText.m */,
 			);
@@ -1119,7 +1116,6 @@
 				EB35B9D0E32EABF1DE8A0DBA3899DE74 /* GDOperation-dummy.m in Sources */,
 				DAE4ECDDBCA193CDEB57C7C6D93F6B7A /* GDORichText.m in Sources */,
 				2D6D510C7986AB7E98FF9108B0F595E0 /* GoodowOperation.pbobjc.m in Sources */,
-				9B725A5AC2BD3A747F4C16674906DE90 /* ReplaceMe.m in Sources */,
 				5C97EDCEEEB19148A6DC713EA643FE1A /* UITextView+GDORichText.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -67,8 +67,9 @@ message Delta {
 
   // 非文本类型内容
   message Embed {
-    string image = 1;
-    string video = 2;
-    bool space = 3;
+    string image = 1; // 图片 url
+    string video = 2; // 视频 url
+    bool space = 3; // 空白点位. 等同于 url 为一个透明图片的 image
+    string button = 4; // 按钮标题. 使用 link 属性表示点击动作
   };
 };

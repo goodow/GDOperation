@@ -337,6 +337,7 @@ typedef GPB_ENUM(GDOPBDelta_Embed_FieldNumber) {
   GDOPBDelta_Embed_FieldNumber_Image = 1,
   GDOPBDelta_Embed_FieldNumber_Video = 2,
   GDOPBDelta_Embed_FieldNumber_Space = 3,
+  GDOPBDelta_Embed_FieldNumber_Button = 4,
 };
 
 /**
@@ -344,11 +345,17 @@ typedef GPB_ENUM(GDOPBDelta_Embed_FieldNumber) {
  **/
 @interface GDOPBDelta_Embed : GPBMessage
 
+/** 图片 url */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *image;
 
+/** 视频 url */
 @property(nonatomic, readwrite, copy, null_resettable) NSString *video;
 
+/** 空白点位. 等同于 url 为一个透明图片的 image */
 @property(nonatomic, readwrite) BOOL space;
+
+/** 按钮标题. 使用 link 属性表示点击动作 */
+@property(nonatomic, readwrite, copy, null_resettable) NSString *button;
 
 @end
 

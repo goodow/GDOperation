@@ -167,7 +167,7 @@
         NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:attr];
         [self.attributedText insertAttributedString:str atIndex:cursor];
         if (op.attributes.link.length) {
-          _textView.linkTextAttributes = attr;
+          self.textView.linkTextAttributes = attr;
         }
       } else {
         NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
@@ -409,10 +409,9 @@
 }
 
 #pragma mark - UITextViewDelegate
-- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange {
-  NSString *clientId = [GDCBusProvider clientId];
-  NSString *topic = [NSString stringWithFormat:@"%@/action/views", clientId];
-  [self.bus publishLocal:topic payload:URL.absoluteString];
+- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)url inRange:(NSRange)characterRange {
+  NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
+  [self.bus publishLocal:topic payload:url.absoluteString];
   return NO;
 }
 

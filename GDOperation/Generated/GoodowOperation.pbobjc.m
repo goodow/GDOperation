@@ -581,11 +581,13 @@ typedef struct GDOPBDelta_Operation__storage_ {
 @dynamic image;
 @dynamic video;
 @dynamic space;
+@dynamic button;
 
 typedef struct GDOPBDelta_Embed__storage_ {
   uint32_t _has_storage_[1];
   NSString *image;
   NSString *video;
+  NSString *button;
 } GDOPBDelta_Embed__storage_;
 
 // This method is threadsafe because it is initially called
@@ -620,6 +622,15 @@ typedef struct GDOPBDelta_Embed__storage_ {
         .offset = 3,  // Stored in _has_storage_ to save space.
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeBool,
+      },
+      {
+        .name = "button",
+        .dataTypeSpecific.className = NULL,
+        .number = GDOPBDelta_Embed_FieldNumber_Button,
+        .hasIndex = 4,
+        .offset = (uint32_t)offsetof(GDOPBDelta_Embed__storage_, button),
+        .flags = GPBFieldOptional,
+        .dataType = GPBDataTypeString,
       },
     };
     GPBDescriptor *localDescriptor =
