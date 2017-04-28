@@ -6,7 +6,7 @@
 #import "GDOModel.h"
 #import "GoodowOperation.pbobjc.h"
 #import "GDOPBDelta+GDOperation.h"
-
+#import "GPBMessage+JsonFormat.h"
 @implementation GDOModel {
 
 }
@@ -26,7 +26,18 @@
     .setLink(@"http://www.baidu.com");
     //        .setSize(@"22px");
     linkDelta.insert(@"Baidu", linkDeltaAttribute);
-    _dataSource[1] = linkDelta;
+
+
+
+    NSString *dataFile = [[NSBundle mainBundle] pathForResource:@"richtext" ofType:@"json"];
+    NSData *dataj = [NSData dataWithContentsOfFile:dataFile];//[dataFile dataUsingEncoding:NSUTF8StringEncoding];
+
+    NSDictionary *json = [NSJSONSerialization JSONObjectWithData:dataj
+                                                         options:NSJSONReadingMutableContainers
+                                                           error:nil];
+    _dataSource[1] = [GDOPBDelta parseFromJson:json error:nil];
+
+
   }
 
   return self;

@@ -26,6 +26,8 @@
 		8073E3B21E5BFC7B005322F1 /* GDOTextViewTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 8073E3B01E5BFC7B005322F1 /* GDOTextViewTableViewCell.m */; };
 		8073E3B31E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8073E3B11E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib */; };
 		873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 873B8AEA1B1F5CCA007FD442 /* Main.storyboard */; };
+		98BAD9041EB84C46004D5526 /* richtext.json in Resources */ = {isa = PBXBuildFile; fileRef = 98BAD9031EB84C46004D5526 /* richtext.json */; };
+		98BAD9071EB84E81004D5526 /* GDOTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 98BAD9061EB84E81004D5526 /* GDOTextViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +74,9 @@
 		8073E3B11E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GDOTextViewTableViewCell.xib; sourceTree = "<group>"; };
 		8073E3B41E5BFDEF005322F1 /* GDOTableViewCellProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDOTableViewCellProtocol.h; sourceTree = "<group>"; };
 		873B8AEA1B1F5CCA007FD442 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
+		98BAD9031EB84C46004D5526 /* richtext.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = richtext.json; sourceTree = "<group>"; };
+		98BAD9051EB84E81004D5526 /* GDOTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDOTextViewController.h; sourceTree = "<group>"; };
+		98BAD9061EB84E81004D5526 /* GDOTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDOTextViewController.m; sourceTree = "<group>"; };
 		F3732917EA64F8E8134D4BBC /* GDOperation.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = GDOperation.podspec; path = ../GDOperation.podspec; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -136,6 +141,9 @@
 		6003F593195388D20070C39A /* Example for GDOperation */ = {
 			isa = PBXGroup;
 			children = (
+				98BAD9051EB84E81004D5526 /* GDOTextViewController.h */,
+				98BAD9061EB84E81004D5526 /* GDOTextViewController.m */,
+				98BAD9031EB84C46004D5526 /* richtext.json */,
 				6003F59C195388D20070C39A /* GDOAppDelegate.h */,
 				6003F59D195388D20070C39A /* GDOAppDelegate.m */,
 				873B8AEA1B1F5CCA007FD442 /* Main.storyboard */,
@@ -275,6 +283,7 @@
 			files = (
 				873B8AEB1B1F5CCA007FD442 /* Main.storyboard in Resources */,
 				8073E3B31E5BFC7B005322F1 /* GDOTextViewTableViewCell.xib in Resources */,
+				98BAD9041EB84C46004D5526 /* richtext.json in Resources */,
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,
 				462BDED01DFBFFC1009443C1 /* GDOTableViewCell.xib in Resources */,
 				6003F598195388D20070C39A /* InfoPlist.strings in Resources */,
@@ -343,6 +352,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				98BAD9071EB84E81004D5526 /* GDOTextViewController.m in Sources */,
 				462BDECF1DFBFFC1009443C1 /* GDOTableViewCell.m in Sources */,
 				6003F59E195388D20070C39A /* GDOAppDelegate.m in Sources */,
 				462BDECB1DFBFF22009443C1 /* GDOTableViewController.m in Sources */,

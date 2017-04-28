@@ -3,11 +3,12 @@
 //
 
 #import "GDORichText.h"
-#import <UIKit/NSAttributedString.h>
-#import <UIKit/NSParagraphStyle.h>
 #import "NSObject+GDChannel.h"
 #import "GDCBusProvider.h"
 #import "UITextView+GDORichText.h"
+#import <objc/runtime.h>
+
+static const char kAttachmentKey = 0;
 
 @interface GDORichText () <UITextViewDelegate>
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
@@ -18,12 +19,13 @@
 @implementation GDORichText {
 }
 
+// 以label初始化
 - (instancetype)initWithLabel:(UILabel *)label {
   self = [super init];
   if (self) {
     _label = label;
     _attributedText = label.attributedText.mutableCopy;
-    if (!_attributedText.length) {
+    if (!_attributedText.length) { // 所有的delta以\n结尾
       self.setText(@"\n");
     }
   }
@@ -31,12 +33,13 @@
   return self;
 }
 
+// 以textview初始化
 - (instancetype)initWithTextView:(UITextView *)textView {
   self = [super init];
   if (self) {
     _textView = textView;
     _textView.delegate = self;
-    _textView.richText = self;
+    _textView.richText = self; // 增加richtext属性
     _attributedText = textView.attributedText.mutableCopy;
     if (!_attributedText.length) {
       self.setText(@"\n");
@@ -56,6 +59,7 @@
 
 #pragma mark - Content
 
+// 更新content
 - (GDOPBDelta *(^)(GDOPBDelta *delta))updateContents {
   return ^GDOPBDelta *(GDOPBDelta *delta) {
       [self apply:delta];
@@ -64,22 +68,25 @@
   };
 }
 
+// 获取content
 - (GDOPBDelta *(^)(NSRange range))getContents {
   return ^GDOPBDelta *(NSRange range) {
       return nil;
   };
 }
 
+// 设置content,先清除content，再更新content
 - (GDOPBDelta *(^)(GDOPBDelta *delta))setContents {
   return ^GDOPBDelta *(GDOPBDelta *delta) {
       NSUInteger length = self.attributedText.length;
       [self.attributedText deleteCharactersInRange:NSMakeRange(0, length)];
       GDOPBDelta *contents = self.updateContents(delta);
-//      return contents.delete(length);
+      //      return contents.delete(length);
       return nil;
   };
 }
 
+// 获取文本
 - (NSString *(^)(NSRange range))getText {
   return ^NSString *(NSRange range) {
       NSString *string = self.attributedText.string;
@@ -87,15 +94,17 @@
   };
 }
 
+// 设置文本
 - (GDOPBDelta *(^)(NSString *text))setText {
   return ^GDOPBDelta *(NSString *text) {
       NSUInteger length = self.attributedText.length;
-      [self.attributedText replaceCharactersInRange:NSMakeRange(0, length) withString:text];
-      [self update];
-      return [GDOPBDelta message].insert(text, nil).delete(length);
+      [self.attributedText replaceCharactersInRange:NSMakeRange(0, length) withString:text]; // 替换文本
+      [self update]; // 更新label和textview的属性
+      return [GDOPBDelta message].insert(text, nil).delete(length); // 构造了一个用于返回的delta
   };
 }
 
+// 删除文本
 - (GDOPBDelta *(^)(NSRange range))deleteText {
   return ^GDOPBDelta *(NSRange range) {
       [self.attributedText deleteCharactersInRange:range];
@@ -104,6 +113,7 @@
   };
 }
 
+// 插入文本
 - (GDOPBDelta *(^)(unsigned long long index, NSString *text, GDOPBAttribute *attributes))insertText {
   return ^GDOPBDelta *(unsigned long long int index, NSString *text, GDOPBAttribute *attributes) {
       NSAttributedString *string = [[NSAttributedString alloc] initWithString:text attributes:[self parseInlineAttributes:attributes]];
@@ -113,6 +123,7 @@
   };
 }
 
+// 获取AttributedString长度
 - (unsigned long long (^)())getLength {
   return ^unsigned long long int {
       return self.attributedText.length ?: 1;
@@ -121,6 +132,7 @@
 
 #pragma mark - Formatting
 
+// 获取range范围内的样式,取出来的是NSDictionary，需要转为GDOPBAttribute
 - (GDOPBAttribute *(^)(NSRange range))getFormat {
   return ^GDOPBAttribute *(NSRange range) {
       NSRange r;
@@ -157,26 +169,27 @@
 
 #pragma mark - Internal methods
 
+// 根据delta更新attributedText
 - (void)apply:(GDOPBDelta *)delta {
   long cursor = 0;
-  for (GDOPBDelta_Operation *op in delta.opsArray) {
-    if (op.insert.length) {
+  for (GDOPBDelta_Operation *op in delta.opsArray) { // 遍历富文本片段
+    if (op.insert.length) { // 有文本信息
       NSString *text = op.insert;
-      if (![text isEqualToString:@"\n"]) {
+      if (![text isEqualToString:@"\n"]) { // 不是换行段落
         NSDictionary *attr = [self parseInlineAttributes:op.attributes];
         NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:attr];
         [self.attributedText insertAttributedString:str atIndex:cursor];
         if (op.attributes.link.length) {
           self.textView.linkTextAttributes = attr;
         }
-      } else {
+      } else { // 换行段落
         NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
         long lineStart = 0;
         if (range.location != NSNotFound) {
           lineStart = range.location + 1;
         }
         NSMutableParagraphStyle *paragraphStyle;
-        if (cursor) {
+        if (cursor && ((lineStart + 1) < [self.attributedText length])) {
           paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
         }
         [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:text attributes:paragraphStyle] atIndex:cursor];
@@ -217,26 +230,74 @@
 
     if (op.hasInsertEmbed) {
       if (op.insertEmbed.space) {
-        float spacing = op.attributes.width.floatValue; // 间隔
-        if (spacing > 0) {
-          unichar objectReplacementChar = 0xFFFC;
-          NSAttributedString * placeholder = [[NSAttributedString alloc] initWithString:[NSString stringWithCharacters:&objectReplacementChar length:1] attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:.1]}]; // iOS 9如果设置font-size为0，则spacing不生效
-          [self.attributedText insertAttributedString:placeholder atIndex:cursor];
-          [self.attributedText addAttribute:NSKernAttributeName
-                                      value:@(spacing - 0.1)
-                                      range:NSMakeRange(cursor, 1)];
+        if ((op.attributes.width.floatValue > 0) || (op.attributes.height.floatValue > 0)) {
+          NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
+          textAttachment.image = [UIImage new];
+          CGFloat width = [op.attributes.width floatValue]?:0.1;
+          CGFloat height = [op.attributes.height floatValue]?:0.1;
+          textAttachment.bounds = CGRectMake(0, 0,width , height);
+          if ([op.attributes.link length]) {
+            objc_setAssociatedObject(textAttachment, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+          }
+          NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
+          [self.attributedText insertAttributedString:attr9 atIndex:cursor];
           cursor += 1;
         }
-        
-      } else {
+      } else if (op.insertEmbed.image || op.insertEmbed.button) {
+        NSString *imageName = op.insertEmbed.image ?: op.insertEmbed.button;
+        NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
+        UIImage *image = [UIImage imageNamed:imageName];
+        if (image) {
+          textAttachment.image = image;
+        } else {
+          NSURL *url = [NSURL URLWithString:imageName];
+          __weak typeof(self) weakSelf = self;
+          NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+              if (!error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                  textAttachment.image = [UIImage imageWithData:data];
+                  [weakSelf update];
+                });
+              } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                  textAttachment.image = [UIImage new];
+                  [weakSelf update];
+                });
+              }
+          }];
+          [task resume];
+        }
+        if ([op.attributes.width floatValue] && [op.attributes.height floatValue]) {
+          textAttachment.bounds = CGRectMake(0, 0,[op.attributes.width floatValue] , [op.attributes.height floatValue]);
+        }
+
+
+        if ([op.attributes.link length]) {
+          objc_setAssociatedObject(self, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
+        [self.attributedText insertAttributedString:attr9 atIndex:cursor];
+        cursor += 1;
         // other implementation
-//        cursor += 1;
+        //        cursor += 1;
+      } else if (op.insertEmbed.video) {
+        NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
+        textAttachment.image = [UIImage imageNamed:op.insertEmbed.video];
+        textAttachment.contents = [UIImage imageNamed:op.insertEmbed.video];
+        NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
+        [self.attributedText insertAttributedString:attr9 atIndex:cursor];
+        cursor += 1;
+
+        // other implementation
+        //        cursor += 1;
       }
       continue;
     }
   }
 }
 
+
+// GDOPBAttribute样式集合转为NSAttribute的属性的字典 针对单个文字
 - (NSDictionary<NSString *, id> *)parseInlineAttributes:(GDOPBAttribute *)attributes {
   NSMutableDictionary<NSString *, id> *attrs = @{}.mutableCopy;
   if (attributes.color.length) {
@@ -246,7 +307,7 @@
     attrs[NSBackgroundColorAttributeName] = [self _colorFromHex:attributes.background];
   }
   if (attributes.size.length || attributes.font.length) {
-//    UIFont *font = [self.attributedText attribute:NSFontAttributeName atIndex:<#(NSUInteger)location#> effectiveRange:nil];
+    //    UIFont *font = [self.attributedText attribute:NSFontAttributeName atIndex:<#(NSUInteger)location#> effectiveRange:nil];
     UIFont *font = [UIFont fontWithName:attributes.font.length ? attributes.font : @"Helvetica" size:[self _sizeFromString:attributes.size]];
     attrs[NSFontAttributeName] = font;
   }
@@ -269,6 +330,7 @@
   return attrs;
 }
 
+// GDOPBAttribute样式集合转为NSAttribute的属性的字典 针对段落
 - (BOOL)parseBlockAttributes:(GDOPBAttribute *)attributes style:(NSMutableParagraphStyle *)paragraph {
   BOOL hasChange = NO;
   GDOPBAttribute_Alignment align = attributes.align;
@@ -296,7 +358,7 @@
     }
   }
   NSMutableDictionary<NSString *, NSString *> *extras = attributes.extras;
-  
+
   for (NSString *key in extras) {
     NSString *value = extras[key];
     CGFloat f_value;
@@ -326,7 +388,8 @@
   return hasChange;
 }
 
--(GDOPBAttribute *)parseNSAttributes:(NSDictionary<NSString *, id> *)attr {
+// NSAttribute的属性的字典转为GDOPBAttribute样式集合
+- (GDOPBAttribute *)parseNSAttributes:(NSDictionary<NSString *, id> *)attr {
   GDOPBAttribute *attribute = [GDOPBAttribute message];
   for (NSString *key in attr) {
     if ([key isEqualToString:NSForegroundColorAttributeName]) {
@@ -355,6 +418,7 @@
   return attribute;
 }
 
+// 更新label和textview的属性和样式
 - (void)update {
   if (_label) {
     _label.attributedText = self.attributedText;
@@ -364,6 +428,7 @@
   }
 }
 
+// 颜色转换
 - (UIColor *)_colorFromHex:(NSString *)hexString {
   unsigned hex;
   NSScanner *scanner = [NSScanner scannerWithString:hexString];
@@ -385,7 +450,7 @@
 }
 
 - (BOOL)_value:(CGFloat *)value fromString:(NSString *)string attributeName:(NSString *)attributeName {
-  BOOL isValid;
+  BOOL isValid = NO;
   if ([string hasSuffix:@"px"]) {
     *value = [[string substringToIndex:string.length - @"px".length] floatValue];
     isValid = YES;
@@ -409,9 +474,21 @@
 }
 
 #pragma mark - UITextViewDelegate
+
+// textView回调，用于跳转富文本中的超链接
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)url inRange:(NSRange)characterRange {
   NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
   [self.bus publishLocal:topic payload:url.absoluteString];
+  return NO;
+}
+
+- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
+  NSString *attachLink = objc_getAssociatedObject(textAttachment, &kAttachmentKey);
+  if ([attachLink length]) {
+    NSString *clientId = [GDCBusProvider clientId];
+    NSString *topic = [NSString stringWithFormat:@"%@/actions/views", clientId];
+    [self.bus publishLocal:topic payload:attachLink];
+  }
   return NO;
 }
 
