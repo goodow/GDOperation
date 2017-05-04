@@ -230,11 +230,11 @@ static const char kAttachmentKey = 0;
 
     if (op.hasInsertEmbed) {
       if (op.insertEmbed.space) {
-        if ((op.attributes.width.floatValue > 0) || (op.attributes.height.floatValue > 0)) {
+        if (([self _sizeFromString:op.attributes.width] > 0) || ([self _sizeFromString:op.attributes.height] > 0)) {
           NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
           textAttachment.image = [UIImage new];
-          CGFloat width = [op.attributes.width floatValue]?:0.1;
-          CGFloat height = [op.attributes.height floatValue]?:0.1;
+          CGFloat width = [self _sizeFromString:op.attributes.width]?:0.1;
+          CGFloat height = [self _sizeFromString:op.attributes.height]?:0.1;
           textAttachment.bounds = CGRectMake(0, 0,width , height);
           if ([op.attributes.link length]) {
             objc_setAssociatedObject(textAttachment, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -267,13 +267,13 @@ static const char kAttachmentKey = 0;
           }];
           [task resume];
         }
-        if ([op.attributes.width floatValue] && [op.attributes.height floatValue]) {
-          textAttachment.bounds = CGRectMake(0, 0,[op.attributes.width floatValue] , [op.attributes.height floatValue]);
+        if ([self _sizeFromString:op.attributes.width]&& [self _sizeFromString:op.attributes.height]) {
+          textAttachment.bounds = CGRectMake(0, 0,[self _sizeFromString:op.attributes.width] , [self _sizeFromString:op.attributes.height]);
         }
 
 
         if ([op.attributes.link length]) {
-          objc_setAssociatedObject(self, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+          objc_setAssociatedObject(textAttachment, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
         NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
         [self.attributedText insertAttributedString:attr9 atIndex:cursor];
