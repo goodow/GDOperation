@@ -1,14 +1,34 @@
 PODS:
+  - Firebase/Core (4.0.0):
+    - FirebaseAnalytics (= 4.0.0)
+    - FirebaseCore (= 4.0.0)
+  - Firebase/Database (4.0.0):
+    - Firebase/Core
+    - FirebaseDatabase (= 4.0.0)
+  - FirebaseAnalytics (4.0.0):
+    - FirebaseCore (~> 4.0)
+    - FirebaseInstanceID (~> 2.0)
+    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+  - FirebaseCore (4.0.0):
+    - GoogleToolboxForMac/NSData+zlib (~> 2.1)
+  - FirebaseDatabase (4.0.0):
+    - FirebaseAnalytics (~> 4.0)
+  - FirebaseInstanceID (2.0.0):
+    - FirebaseCore (~> 4.0)
   - GDChannel (0.6.0):
     - MQTTKit (~> 0.1.0)
     - Protobuf (~> 3.0)
   - GDOperation (0.1.0):
     - GDChannel
     - Protobuf (~> 3.0)
+  - GoogleToolboxForMac/Defines (2.1.1)
+  - GoogleToolboxForMac/NSData+zlib (2.1.1):
+    - GoogleToolboxForMac/Defines (= 2.1.1)
   - MQTTKit (0.1.0)
   - Protobuf (3.1.0)
 
 DEPENDENCIES:
+  - Firebase/Database
   - GDChannel (from `https://github.com/goodow/GDChannel.git`)
   - GDOperation (from `../`)
 
@@ -16,7 +36,7 @@ EXTERNAL SOURCES:
   GDChannel:
     :git: https://github.com/goodow/GDChannel.git
   GDOperation:
-    :path: ../
+    :path: "../"
 
 CHECKOUT OPTIONS:
   GDChannel:
@@ -24,11 +44,17 @@ CHECKOUT OPTIONS:
     :git: https://github.com/goodow/GDChannel.git
 
 SPEC CHECKSUMS:
+  Firebase: 284eea779b73fdff309791817da7c68bff8dd572
+  FirebaseAnalytics: 6f08e746f7d66f5452931bc2e822b5df9c66b64a
+  FirebaseCore: 85ad466044c2f013cdb167f85d426d15b128114a
+  FirebaseDatabase: d829b3a8c3e2ac7a16773c5df226966b0805dfc2
+  FirebaseInstanceID: 9fbf536668f4d3f0880e7438456dabd1376e294b
   GDChannel: 188843d9ae255227f5a72fcc35ae7d048509682c
   GDOperation: b03b4dbead3232b2413ba14d6eb67b4abacbd2a1
+  GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
   MQTTKit: a4e6b8aa92db1aeae917d2b773fd72a7749937c4
   Protobuf: 265e9977d04a83eba9cefb0bed3ad07e41033b4a
 
-PODFILE CHECKSUM: 21e9d7c4e3b0067d02f511420953750f01ab83ff
+PODFILE CHECKSUM: 1f923e24304c4ea42db10c92f8df94651a8be2fa
 
-COCOAPODS: 1.1.1
+COCOAPODS: 1.2.0

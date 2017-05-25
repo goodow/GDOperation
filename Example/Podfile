@@ -4,4 +4,6 @@ target 'GDOperation_Example' do
   pod 'GDChannel', :git => 'https://github.com/goodow/GDChannel.git'
   pod 'GDOperation', :path => '../'
 
+  pod 'Firebase/Database'
+
 end
