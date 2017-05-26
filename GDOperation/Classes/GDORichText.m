@@ -421,9 +421,11 @@ static const char kAttachmentKey = 0;
 // 更新label和textview的属性和样式
 - (void)update {
   if (_label) {
+  	_label.attributedText = nil; // force to update
     _label.attributedText = self.attributedText;
   }
   if (_textView) {
+  	_textView.attributedText = nil; // force to update
     _textView.attributedText = self.attributedText;
   }
 }
