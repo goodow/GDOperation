@@ -24,7 +24,7 @@ static const char kAttachmentKey = 0;
   self = [super init];
   if (self) {
     _label = label;
-    _attributedText = label.attributedText.mutableCopy;
+    _attributedText = label.attributedText.mutableCopy?:[NSMutableAttributedString new];
     if (!_attributedText.length) { // 所有的delta以\n结尾
       self.setText(@"\n");
     }
@@ -81,6 +81,16 @@ static const char kAttachmentKey = 0;
       NSUInteger length = self.attributedText.length;
       [self.attributedText deleteCharactersInRange:NSMakeRange(0, length)];
       GDOPBDelta *contents = self.updateContents(delta);
+      if (self.label) {
+        NSInteger stringLength = [self.attributedText.string length];
+        if (stringLength>1) {
+          NSString *checkn = [self.attributedText.string substringFromIndex:stringLength-1];
+          if ([checkn isEqualToString:@"\n"]) {
+            [self.attributedText deleteCharactersInRange:NSMakeRange(stringLength-1, 1)];
+            [self update];
+          }
+        }
+      }
       //      return contents.delete(length);
       return nil;
   };
