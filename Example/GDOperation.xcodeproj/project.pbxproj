@@ -11,6 +11,7 @@
 		462BDECB1DFBFF22009443C1 /* GDOTableViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 462BDECA1DFBFF22009443C1 /* GDOTableViewController.m */; };
 		462BDECF1DFBFFC1009443C1 /* GDOTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 462BDECD1DFBFFC1009443C1 /* GDOTableViewCell.m */; };
 		462BDED01DFBFFC1009443C1 /* GDOTableViewCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 462BDECE1DFBFFC1009443C1 /* GDOTableViewCell.xib */; };
+		46FDB8221ED6F2D400E6F87F /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 46FDB8211ED6F2D400E6F87F /* GoogleService-Info.plist */; };
 		6003F58E195388D20070C39A /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58D195388D20070C39A /* Foundation.framework */; };
 		6003F590195388D20070C39A /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F58F195388D20070C39A /* CoreGraphics.framework */; };
 		6003F592195388D20070C39A /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6003F591195388D20070C39A /* UIKit.framework */; };
@@ -48,6 +49,7 @@
 		462BDECC1DFBFFC1009443C1 /* GDOTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GDOTableViewCell.h; sourceTree = "<group>"; };
 		462BDECD1DFBFFC1009443C1 /* GDOTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GDOTableViewCell.m; sourceTree = "<group>"; };
 		462BDECE1DFBFFC1009443C1 /* GDOTableViewCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GDOTableViewCell.xib; sourceTree = "<group>"; };
+		46FDB8211ED6F2D400E6F87F /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		4C1067BAF66B862BF55CE07E /* Pods_GDOperation_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_GDOperation_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58A195388D20070C39A /* GDOperation_Example.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GDOperation_Example.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6003F58D195388D20070C39A /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -105,11 +107,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		46FDB81F1ED6F2D400E6F87F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				46FDB8201ED6F2D400E6F87F /* Firebase */,
+			);
+			path = Resources;
+			sourceTree = SOURCE_ROOT;
+		};
+		46FDB8201ED6F2D400E6F87F /* Firebase */ = {
+			isa = PBXGroup;
+			children = (
+				46FDB8211ED6F2D400E6F87F /* GoogleService-Info.plist */,
+			);
+			path = Firebase;
+			sourceTree = "<group>";
+		};
 		6003F581195388D10070C39A = {
 			isa = PBXGroup;
 			children = (
 				60FF7A9C1954A5C5007DD14C /* Podspec Metadata */,
 				6003F593195388D20070C39A /* Example for GDOperation */,
+				46FDB81F1ED6F2D400E6F87F /* Resources */,
 				6003F58C195388D20070C39A /* Frameworks */,
 				6003F58B195388D20070C39A /* Products */,
 				B1FB1A958264260FFEBD0EA1 /* Pods */,
@@ -287,6 +306,7 @@
 				6003F5A9195388D20070C39A /* Images.xcassets in Resources */,
 				462BDED01DFBFFC1009443C1 /* GDOTableViewCell.xib in Resources */,
 				6003F598195388D20070C39A /* InfoPlist.strings in Resources */,
+				46FDB8221ED6F2D400E6F87F /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -486,7 +506,7 @@
 				GCC_PREFIX_HEADER = "GDOperation/GDOperation-Prefix.pch";
 				INFOPLIST_FILE = "GDOperation/GDOperation-Info.plist";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.goodow.realtime.GDOperation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};
@@ -503,7 +523,7 @@
 				GCC_PREFIX_HEADER = "GDOperation/GDOperation-Prefix.pch";
 				INFOPLIST_FILE = "GDOperation/GDOperation-Info.plist";
 				MODULE_NAME = ExampleApp;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.demo.${PRODUCT_NAME:rfc1034identifier}";
+				PRODUCT_BUNDLE_IDENTIFIER = com.goodow.realtime.GDOperation;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

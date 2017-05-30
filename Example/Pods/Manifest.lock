@@ -19,16 +19,16 @@ PODS:
     - MQTTKit (~> 0.1.0)
     - Protobuf (~> 3.0)
   - GDOperation (0.1.0):
+    - Firebase/Database
     - GDChannel
     - Protobuf (~> 3.0)
   - GoogleToolboxForMac/Defines (2.1.1)
   - GoogleToolboxForMac/NSData+zlib (2.1.1):
     - GoogleToolboxForMac/Defines (= 2.1.1)
   - MQTTKit (0.1.0)
-  - Protobuf (3.1.0)
+  - Protobuf (3.3.0)
 
 DEPENDENCIES:
-  - Firebase/Database
   - GDChannel (from `https://github.com/goodow/GDChannel.git`)
   - GDOperation (from `../`)
 
@@ -40,7 +40,7 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   GDChannel:
-    :commit: 21b47ff897363f40dc4da03723cb130a2f2f4a75
+    :commit: dae9abf5b060e2ac10ab07e18509ee6968c5aa6c
     :git: https://github.com/goodow/GDChannel.git
 
 SPEC CHECKSUMS:
@@ -50,11 +50,11 @@ SPEC CHECKSUMS:
   FirebaseDatabase: d829b3a8c3e2ac7a16773c5df226966b0805dfc2
   FirebaseInstanceID: 9fbf536668f4d3f0880e7438456dabd1376e294b
   GDChannel: 188843d9ae255227f5a72fcc35ae7d048509682c
-  GDOperation: b03b4dbead3232b2413ba14d6eb67b4abacbd2a1
+  GDOperation: 19bd959304668517ba95b01e2d6e0053a31367f2
   GoogleToolboxForMac: 8e329f1b599f2512c6b10676d45736bcc2cbbeb0
   MQTTKit: a4e6b8aa92db1aeae917d2b773fd72a7749937c4
-  Protobuf: 265e9977d04a83eba9cefb0bed3ad07e41033b4a
+  Protobuf: d582fecf68201eac3d79ed61369ef45734394b9c
 
-PODFILE CHECKSUM: 1f923e24304c4ea42db10c92f8df94651a8be2fa
+PODFILE CHECKSUM: 136c8ed661ab668d200aea1ec6c964d8097c3454
 
 COCOAPODS: 1.2.0

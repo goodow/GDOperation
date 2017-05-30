@@ -6,6 +6,9 @@
 #import "GoodowOperation.pbobjc.h"
 #import "GDOPBAttribute+FluentInterface.h"
 
+extern const NSString *NULL_SENTINEL_CHARACTER;
+extern const int NULL_ENUM_VALUE;
+
 @interface GDOPBDelta (GDOperation)
 
 - (GDOPBDelta *(^)(NSString *text, GDOPBAttribute *attributes))insert;
@@ -14,5 +17,8 @@
 
 - (GDOPBDelta *(^)(unsigned long long length))delete;
 
+- (GDOPBDelta *(^)(GDOPBDelta *other))compose;
+
+- (void (^)(BOOL (^predicate)(GDOPBDelta *line, GDOPBAttribute *attributes, int i), NSString *newline))eachLine;
 
 @end

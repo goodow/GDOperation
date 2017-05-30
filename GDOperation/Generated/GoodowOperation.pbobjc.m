@@ -23,9 +23,6 @@
 
 @implementation GDOPBGoodowOperationRoot
 
-// No extensions in the file and no imports, so no need to generate
-// +extensionRegistry.
-
 @end
 
 #pragma mark - GDOPBGoodowOperationRoot_FileDescriptor
@@ -35,9 +32,8 @@ static GPBFileDescriptor *GDOPBGoodowOperationRoot_FileDescriptor(void) {
   // about thread safety of the singleton.
   static GPBFileDescriptor *descriptor = NULL;
   if (!descriptor) {
-    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
+    GPBDebugCheckRuntimeVersion();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"goodow.protobuf"
-                                                 objcPrefix:@"GDOPB"
                                                      syntax:GPBFileSyntaxProto3];
   }
   return descriptor;
@@ -139,7 +135,7 @@ typedef struct GDOPBAttribute__storage_ {
         .number = GDOPBAttribute_FieldNumber_Bold,
         .hasIndex = 5,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, bold),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -148,7 +144,7 @@ typedef struct GDOPBAttribute__storage_ {
         .number = GDOPBAttribute_FieldNumber_Italic,
         .hasIndex = 6,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, italic),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -157,7 +153,7 @@ typedef struct GDOPBAttribute__storage_ {
         .number = GDOPBAttribute_FieldNumber_Underline,
         .hasIndex = 7,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, underline),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -166,7 +162,7 @@ typedef struct GDOPBAttribute__storage_ {
         .number = GDOPBAttribute_FieldNumber_Strike,
         .hasIndex = 8,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, strike),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -175,7 +171,7 @@ typedef struct GDOPBAttribute__storage_ {
         .number = GDOPBAttribute_FieldNumber_Code,
         .hasIndex = 9,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, code),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -184,7 +180,7 @@ typedef struct GDOPBAttribute__storage_ {
         .number = GDOPBAttribute_FieldNumber_Script,
         .hasIndex = 10,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, script),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -202,7 +198,7 @@ typedef struct GDOPBAttribute__storage_ {
         .number = GDOPBAttribute_FieldNumber_Align,
         .hasIndex = 11,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, align),
-        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
+        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -231,7 +227,7 @@ typedef struct GDOPBAttribute__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBAttribute__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
+                                         flags:0];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -477,7 +473,7 @@ typedef struct GDOPBDelta__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBDelta__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
+                                         flags:0];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -564,8 +560,7 @@ typedef struct GDOPBDelta_Operation__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBDelta_Operation__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    [localDescriptor setupContainingMessageClassName:GPBStringifySymbol(GDOPBDelta)];
+                                         flags:0];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -640,8 +635,7 @@ typedef struct GDOPBDelta_Embed__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBDelta_Embed__storage_)
-                                         flags:GPBDescriptorInitializationFlag_None];
-    [localDescriptor setupContainingMessageClassName:GPBStringifySymbol(GDOPBDelta)];
+                                         flags:0];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

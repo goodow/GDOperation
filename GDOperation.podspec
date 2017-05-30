@@ -21,7 +21,7 @@ Pod::Spec.new do |s|
 TODO: Add long description of the pod here.
                        DESC
 
-  s.homepage         = 'https://github.com/<GITHUB_USERNAME>/GDOperation'
+  s.homepage         = 'https://github.com/goodow/GDOperation'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Larry Tin' => 'dev@goodow.com' }
@@ -35,4 +35,5 @@ TODO: Add long description of the pod here.
 
   s.dependency 'Protobuf', '~> 3.0'
   s.dependency 'GDChannel'
+  s.dependency 'Firebase/Database'
 end

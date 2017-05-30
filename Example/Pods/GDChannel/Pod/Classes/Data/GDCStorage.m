@@ -8,6 +8,7 @@
 #import "Channel.pbobjc.h"
 #import "GPBAny+GDChannel.h"
 #import "GDCOptions+ReadAccess.h"
+#import "GDCBusProvider.h"
 
 static NSString *const archiveFileExtension = @"archive";
 static NSString *const protobufFileExtension = @"protobuf";
@@ -18,15 +19,12 @@ static NSString *const protobufFileExtension = @"protobuf";
 }
 
 + (GDCStorage *)instance {
-  static GDCStorage *_instance = nil;
-
-  @synchronized (self) {
-    if (_instance == nil) {
-      _instance = [[self alloc] initWithBaseDirectory:nil];
-    }
-  }
-
-  return _instance;
+  static GDCStorage *instance = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+      instance = [[GDCStorage alloc] initWithBaseDirectory:nil];
+  });
+  return instance;
 }
 
 - (instancetype)initWithBaseDirectory:(NSString *)baseDir {
@@ -64,9 +62,14 @@ static NSString *const protobufFileExtension = @"protobuf";
       if ([message.payload isKindOfClass:GPBMessage.class]) {
         GDCPBMessage *pbMessage = [GDCStorage convertMessageToProtobuf:message];
         NSOutputStream *outputStream = [NSOutputStream outputStreamToFileAtPath:[self getPath:message.topic withExtension:protobufFileExtension] append:NO];
-        [outputStream open];
-        [pbMessage writeToOutputStream:outputStream];
-        [outputStream close];
+        @try {
+          [outputStream open];
+          [pbMessage writeToOutputStream:outputStream];
+          [outputStream close];
+        } @catch (NSException *exception) {
+          NSLog(@"%s failed, message: %@", __PRETTY_FUNCTION__, message);
+          [GDCBusProvider.instance publishLocal:[@"logReport/" stringByAppendingString:@"catch_exception"] payload:[(GDCMessageImpl *) message toJsonWithTopic:YES]];
+        }
         return;
       }
       if (![NSKeyedArchiver archiveRootObject:message toFile:[self getPath:message.topic withExtension:archiveFileExtension]]) {
