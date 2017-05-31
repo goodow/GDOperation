@@ -39,6 +39,7 @@
 
   self.textView = [[UITextView alloc] initWithFrame:CGRectZero];
   self.textView.translatesAutoresizingMaskIntoConstraints = NO;
+  self.textView.editable = NO;
   self.richText = GDOTextView.attachView(self.textView);
 
   FIRDatabaseReference *ref = [[FIRDatabase database] reference];

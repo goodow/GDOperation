@@ -30,10 +30,18 @@ TODO: Add long description of the pod here.
 
   s.ios.deployment_target = '8.0'
 
-  s.source_files = 'GDOperation/Classes/**/*', 'GDOperation/Generated/**/*'
-  s.requires_arc = ['GDOperation/Classes/**/*']
+  s.subspec 'Core' do |sp|
+    s.dependency 'Protobuf', '~> 3.0'
+    s.dependency 'GDChannel'
+    s.dependency 'Firebase/Database'
 
-  s.dependency 'Protobuf', '~> 3.0'
-  s.dependency 'GDChannel'
-  s.dependency 'Firebase/Database'
+    sp.requires_arc = ['GDOperation/Classes/**/*']
+    sp.source_files = 'GDOperation/Classes/**/*', 'GDOperation/Generated/**/*'
+  end
+
+  s.subspec 'YYText' do |sp|
+    sp.dependency 'GDOperation/Core'
+    sp.dependency 'YYText', '~> 1.0'
+    sp.source_files = 'GDOperation/Classes/YYText/**/*'
+  end
 end

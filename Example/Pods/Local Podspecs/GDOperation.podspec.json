@@ -18,13 +18,6 @@
   "platforms": {
     "ios": "8.0"
   },
-  "source_files": [
-    "GDOperation/Classes/**/*",
-    "GDOperation/Generated/**/*"
-  ],
-  "requires_arc": [
-    "GDOperation/Classes/**/*"
-  ],
   "dependencies": {
     "Protobuf": [
       "~> 3.0"
@@ -35,5 +28,29 @@
     "Firebase/Database": [
 
     ]
-  }
+  },
+  "subspecs": [
+    {
+      "name": "Core",
+      "requires_arc": [
+        "GDOperation/Classes/**/*"
+      ],
+      "source_files": [
+        "GDOperation/Classes/**/*",
+        "GDOperation/Generated/**/*"
+      ]
+    },
+    {
+      "name": "YYText",
+      "dependencies": {
+        "GDOperation/Core": [
+
+        ],
+        "YYText": [
+          "~> 1.0"
+        ]
+      },
+      "source_files": "GDOperation/Classes/YYText/**/*"
+    }
+  ]
 }
