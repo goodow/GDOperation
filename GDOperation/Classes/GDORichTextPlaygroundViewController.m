@@ -17,6 +17,9 @@
 @interface GDORichTextPlaygroundViewController ()
 @property(strong) GDOPBDelta *delta;
 @property(strong) GDOPBDelta *contents;
+@property(nonatomic, strong) UITextView *textView;
+@property(nonatomic, strong) GDORichText *richText;
+@property(nonatomic, strong) NSLayoutConstraint *heightConstraint;
 @end
 
 @implementation GDORichTextPlaygroundViewController
@@ -34,12 +37,18 @@
   self.tableView.rowHeight = UITableViewAutomaticDimension;
   self.tableView.allowsSelection = NO;
 
+  self.textView = [[UITextView alloc] initWithFrame:CGRectZero];
+  self.textView.translatesAutoresizingMaskIntoConstraints = NO;
+  self.richText = GDOTextView.attachView(self.textView);
+
   FIRDatabaseReference *ref = [[FIRDatabase database] reference];
   GDOFirebaseAdapter *adapter = [[GDOFirebaseAdapter alloc] initWithRef:[ref child:@"richText/default"]];
   __weak GDORichTextPlaygroundViewController *weak = self;
   adapter.onTextChange = ^(GDOPBDelta *delta, GDOPBDelta *contents) {
       weak.delta = delta;
       weak.contents = contents;
+
+      weak.richText.updateContents(delta);
       [weak.tableView reloadData];
   };
 }
@@ -62,16 +71,21 @@
       cell.textLabel.text = @"UITextView 预览:";
       break;
     case 1: {
-      UITextView *textView = [[UITextView alloc] initWithFrame:CGRectZero];
-      [cell.contentView addSubview:textView];
-      textView.translatesAutoresizingMaskIntoConstraints = NO;
-      [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
-          @"H:|-0-[view]-0-|"                                                  options:0 metrics:nil views:@{@"view" : textView}]];
-      [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
-          @"V:|-0-[view(100)]|"                                                      options:0 metrics:nil views:@{@"view" : textView}]];
-      GDOTextView.attachView(textView).setContents(self.contents);
+      cell = [tableView dequeueReusableCellWithIdentifier:@"textView"];
+      if (!cell) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"textView"];
+        [cell.contentView addSubview:self.textView];
+        [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
+            @"H:|-0-[view]-0-|"                                                  options:0 metrics:nil views:@{@"view" : self.textView}]];
+        [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
+            @"V:|-0-[view]-0@750-|"                                                      options:0 metrics:nil views:@{@"view" : self.textView}]];
+        self.heightConstraint = [NSLayoutConstraint constraintWithItem:self.textView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:44];
+        [self.textView addConstraint:self.heightConstraint];
+      }
 
-      [cell layoutIfNeeded];
+      CGSize size = [self.textView sizeThatFits:CGSizeMake(cell.bounds.size.width, MAXFLOAT)];
+      self.heightConstraint.constant = size.height;
+//      [cell layoutIfNeeded];
     }
       break;
     case 2:

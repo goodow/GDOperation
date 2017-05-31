@@ -53,7 +53,7 @@
 // 设置content,先清除content，再更新content
 - (GDOPBDelta *(^)(GDOPBDelta *delta))setContents {
   return ^GDOPBDelta *(GDOPBDelta *delta) {
-      unsigned long long int length = self.editor.delta.length;
+      unsigned long long length = self.editor.delta.length - 1;
       if (length) {
         delta = GDOPBDelta.message.delete(length).compose(delta);
       }

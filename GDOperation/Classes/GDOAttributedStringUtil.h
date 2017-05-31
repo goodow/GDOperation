@@ -8,7 +8,8 @@
 
 
 @interface GDOAttributedStringUtil : NSObject
-+ (NSDictionary<NSString *, id> *)parseInlineAttributes:(GDOPBAttribute *)attributes;
+
++ (NSDictionary<NSString *, id> *)parseInlineAttributes:(GDOPBAttribute *)attributes toRemove:(NSArray **)toRemovePtr;
 
 + (BOOL)parseBlockAttributes:(GDOPBAttribute *)attributes style:(NSMutableParagraphStyle *)paragraph;
 

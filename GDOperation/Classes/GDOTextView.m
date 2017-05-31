@@ -36,8 +36,8 @@ static const char kAttachmentKey = 0;
     _textView = textView;
     _textView.delegate = self;
     _textView.richText = self; // 增加richtext属性
-    _attributedText = textView.attributedText.mutableCopy;
-    _delta = GDOPBDelta.message;
+    _attributedText = [[NSMutableAttributedString alloc] initWithString:@"\n"];
+    _delta = GDOPBDelta.message.insert(@"\n", nil);
   }
   return self;
 }
@@ -46,6 +46,7 @@ static const char kAttachmentKey = 0;
   return ^GDOPBDelta *(GDOPBDelta *delta) {
       [self apply:delta];
       [self update];
+      self.delta = self.delta.compose(delta);
       return nil;
   };
 }
@@ -59,7 +60,7 @@ static const char kAttachmentKey = 0;
     if (op.insert.length) { // 有文本信息
       NSString *text = op.insert;
       if (![text isEqualToString:@"\n"]) { // 不是换行段落
-        NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes];
+        NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
         NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:attr];
         [self.attributedText insertAttributedString:str atIndex:cursor];
         if (op.attributes.link.length) {
@@ -71,14 +72,14 @@ static const char kAttachmentKey = 0;
         if (range.location != NSNotFound) {
           lineStart = range.location + 1;
         }
-        NSMutableParagraphStyle *paragraphStyle;
-        if (cursor && ((lineStart + 1) < [self.attributedText length])) {
+        [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:@"\n"] atIndex:cursor];
+        NSMutableParagraphStyle *paragraphStyle = nil;
+        if (cursor && ((lineStart + 1) < self.attributedText.length)) {
           paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
         }
-        [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:text attributes:paragraphStyle] atIndex:cursor];
         paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
         if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
-          [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
+          [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor + 1 - lineStart)];
         }
       }
       cursor += text.length;
@@ -87,9 +88,13 @@ static const char kAttachmentKey = 0;
 
     if (op.retain_p > 0) {
       if ([self.attributedText.string characterAtIndex:cursor] != '\n') {
-        NSDictionary<NSString *, id> *attrs = [GDOAttributedStringUtil parseInlineAttributes:op.attributes];
+        NSArray *toRemove;
+        NSDictionary<NSString *, id> *attrs = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:&toRemove];
         if (attrs.count) {
           [self.attributedText addAttributes:attrs range:NSMakeRange(cursor, op.retain_p)];
+        }
+        for (NSString *key in toRemove) {
+          [self.attributedText removeAttribute:key range:NSMakeRange(cursor, op.retain_p)];
         }
       } else {
         NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor == 0 ? 0 : cursor - 1)];
@@ -98,7 +103,8 @@ static const char kAttachmentKey = 0;
           lineStart = range.location + 1;
         }
         NSMutableParagraphStyle *paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
-        if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init]]) {
+        paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
+        if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
           [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
         }
       }

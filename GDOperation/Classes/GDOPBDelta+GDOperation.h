@@ -7,7 +7,7 @@
 #import "GDOPBAttribute+FluentInterface.h"
 
 extern const NSString *NULL_SENTINEL_CHARACTER;
-extern const int NULL_ENUM_VALUE;
+#define NULL_ENUM_VALUE 15
 
 @interface GDOPBDelta (GDOperation)
 

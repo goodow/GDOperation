@@ -3,14 +3,12 @@
 //
 
 #import "GDOPBDelta+GDOperation.h"
-#import "GDORichText.h"
 
 enum GDOOperationType {
   Insert, Retain, Delete
 };
 
 const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
-const int NULL_ENUM_VALUE = 15;
 
 @interface GDOOperationIterator : NSObject
 @property NSArray<GDOPBDelta_Operation *> *ops;

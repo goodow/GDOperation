@@ -4,6 +4,7 @@
 
 #import "GDOAttributedStringUtil.h"
 #import "GoodowOperation.pbobjc.h"
+#import "GDOPBDelta+GDOperation.h"
 
 
 @implementation GDOAttributedStringUtil {
@@ -11,33 +12,59 @@
 }
 
 // GDOPBAttribute样式集合转为NSAttribute的属性的字典 针对单个文字
-+ (NSDictionary<NSString *, id> *)parseInlineAttributes:(GDOPBAttribute *)attributes {
++ (NSDictionary<NSString *, id> *)parseInlineAttributes:(GDOPBAttribute *)attributes toRemove:(NSArray **)toRemovePtr {
+  NSMutableArray *toRemove = nil;
+  if (toRemovePtr) {
+    toRemove = @[].mutableCopy;
+    *toRemovePtr = toRemove;
+  }
+  BOOL (^hasStringValue)(NSString *, NSString *) = ^(NSString *key, NSString *value) {
+      if (!value.length) {
+        return NO;
+      }
+      if (toRemove && [NULL_SENTINEL_CHARACTER isEqualToString:value]) {
+        if (key) { [toRemove addObject:key]; }
+        return NO;
+      }
+      return YES;
+  };
+  BOOL (^hasBoolValue)(NSString *, GDOPBAttribute_Bool *) = ^(NSString *key, GDOPBAttribute_Bool *value) {
+      if (value == 0) {
+        return NO;
+      }
+      if (toRemove && value == GDOPBAttribute_Bool_False) {
+        if (key) { [toRemove addObject:key]; }
+        return NO;
+      }
+      return YES;
+  };
+
   NSMutableDictionary<NSString *, id> *attrs = @{}.mutableCopy;
-  if (attributes.color.length) {
+  if (hasStringValue(NSForegroundColorAttributeName, attributes.color)) {
     attrs[NSForegroundColorAttributeName] = [self _colorFromHex:attributes.color];
   }
-  if (attributes.background.length) {
+  if (hasStringValue(NSBackgroundColorAttributeName, attributes.background)) {
     attrs[NSBackgroundColorAttributeName] = [self _colorFromHex:attributes.background];
   }
-  if (attributes.size.length || attributes.font.length) {
+  if (hasStringValue(nil, attributes.size) || hasStringValue(nil, attributes.font)) {
     //    UIFont *font = [self.attributedText attribute:NSFontAttributeName atIndex:<#(NSUInteger)location#> effectiveRange:nil];
-    UIFont *font = [UIFont fontWithName:attributes.font.length ? attributes.font : @"Helvetica" size:[self sizeFromString:attributes.size]];
+    UIFont *font = [UIFont fontWithName:hasStringValue(nil, attributes.font) ? attributes.font : @"Helvetica" size:[self sizeFromString:attributes.size]];
     attrs[NSFontAttributeName] = font;
   }
-  if (attributes.link.length) {
+  if (hasStringValue(NSLinkAttributeName, attributes.link)) {
     attrs[NSLinkAttributeName] = attributes.link;
   }
-  if (attributes.bold) {
-    attrs[NSExpansionAttributeName] = @(attributes.bold == GDOPBAttribute_Bool_True ? 0.2 : 0);
+  if (hasBoolValue(NSExpansionAttributeName, attributes.bold)) {
+    attrs[NSExpansionAttributeName] = @0.2;
   }
-  if (attributes.italic) {
-    attrs[NSObliquenessAttributeName] = @(attributes.italic == GDOPBAttribute_Bool_True ? 0.3 : 0);
+  if (hasBoolValue(NSObliquenessAttributeName, attributes.italic)) {
+    attrs[NSObliquenessAttributeName] = @0.3;
   }
-  if (attributes.underline) {
-    attrs[NSUnderlineStyleAttributeName] = @(attributes.underline == GDOPBAttribute_Bool_True ? NSUnderlineStyleSingle : NSUnderlineStyleNone);
+  if (hasBoolValue(NSUnderlineStyleAttributeName, attributes.underline)) {
+    attrs[NSUnderlineStyleAttributeName] = @(NSUnderlineStyleSingle);
   }
-  if (attributes.strike) {
-    attrs[NSStrikethroughStyleAttributeName] = @(attributes.strike == GDOPBAttribute_Bool_True ? NSUnderlineStyleSingle : NSUnderlineStyleNone);
+  if (hasBoolValue(NSStrikethroughStyleAttributeName, attributes.strike)) {
+    attrs[NSStrikethroughStyleAttributeName] = @(NSUnderlineStyleSingle);
   }
 
   return attrs;
@@ -46,11 +73,12 @@
 // GDOPBAttribute样式集合转为NSAttribute的属性的字典 针对段落
 + (BOOL)parseBlockAttributes:(GDOPBAttribute *)attributes style:(NSMutableParagraphStyle *)paragraph {
   BOOL hasChange = NO;
-  GDOPBAttribute_Alignment align = attributes.align;
+  GDOPBAttribute_Alignment align = GDOPBAttribute_Align_RawValue(attributes);
   if (align != 0) {
     enum NSTextAlignment textAlignment = -1;
     switch (align) {
       case GDOPBAttribute_Alignment_Left:
+      case NULL_ENUM_VALUE:
         textAlignment = NSTextAlignmentLeft;
         break;
       case GDOPBAttribute_Alignment_Center:

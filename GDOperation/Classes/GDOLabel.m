@@ -30,8 +30,8 @@ static const char kAttachmentKey = 0;
   self = [super init];
   if (self) {
     _label = label;
-    _attributedText = label.attributedText.mutableCopy ?: [NSMutableAttributedString new];
-    _delta = GDOPBDelta.message;
+    _attributedText = [[NSMutableAttributedString alloc] init];
+    _delta = GDOPBDelta.message.insert(@"\n", nil);
   }
 
   return self;
@@ -64,7 +64,7 @@ static const char kAttachmentKey = 0;
     }
     if (op.insert.length) {
       NSString *text = op.insert;
-      NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes];
+      NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
       NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:attr];
       [self.attributedText appendAttributedString:str];
       continue;
