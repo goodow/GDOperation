@@ -12,6 +12,7 @@
 #import "GDOPBDelta+GDOperation.h"
 #import "GPBMessage+JsonFormat.h"
 #import "GDORichText.h"
+#import "GDORichTextPlaygroundViewController.h"
 
 @interface GDOTextViewController ()
 @property(strong ,nonatomic)UITextView *detailTextView;
@@ -40,6 +41,10 @@
   [[GDORichText alloc] initWithTextView:self.detailTextView].setContents([GDOPBDelta parseFromJson:json error:nil]);
   self.detailTextView.backgroundColor = [UIColor blueColor];
 
+
+  dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_MSEC), dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^(void) {
+      [self presentViewController:[[GDORichTextPlaygroundViewController alloc] initWithStyle:UITableViewStylePlain] animated:YES completion:nil];
+  });
 }
 - (void)didReceiveMemoryWarning
 {

@@ -11,6 +11,8 @@
 #import "GDOFirebaseAdapter.h"
 #import "GPBMessage+JsonFormat.h"
 #import "Firebase.h"
+#import "GDOTextView.h"
+#import "GDOLabel.h"
 
 @interface GDORichTextPlaygroundViewController ()
 @property(strong) GDOPBDelta *delta;
@@ -67,8 +69,7 @@
           @"H:|-0-[view]-0-|"                                                  options:0 metrics:nil views:@{@"view" : textView}]];
       [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
           @"V:|-0-[view(100)]|"                                                      options:0 metrics:nil views:@{@"view" : textView}]];
-      GDORichText *richText = [[GDORichText alloc] initWithTextView:textView];
-      richText.setContents(self.contents);
+      GDOTextView.attachView(textView).setContents(self.contents);
 
       [cell layoutIfNeeded];
     }
@@ -76,11 +77,9 @@
     case 2:
       cell.textLabel.text = @"UILabel 预览:";
       break;
-    case 3: {
-      GDORichText *richText = [[GDORichText alloc] initWithLabel:cell.textLabel];
-      richText.setContents(self.contents);
+    case 3:
+      GDOLabel.attachView(cell.textLabel).setContents(self.contents);
       cell.textLabel.numberOfLines = 0;
-    }
       break;
     case 4:
       cell.textLabel.text = @"差量:";

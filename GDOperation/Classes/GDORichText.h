@@ -7,11 +7,13 @@
 #import "GDOPBAttribute+FluentInterface.h"
 
 @class GDOPBDelta;
+@protocol GDOEditor;
 
 @interface GDORichText : NSObject
 
 - (instancetype)initWithLabel:(UILabel *)label;
 - (instancetype)initWithTextView:(UITextView *)textView;
+- (instancetype)initWithEditor:(id<GDOEditor>)editor;
 
 #pragma mark - Content
 

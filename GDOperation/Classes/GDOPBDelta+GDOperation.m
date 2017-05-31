@@ -3,6 +3,7 @@
 //
 
 #import "GDOPBDelta+GDOperation.h"
+#import "GDORichText.h"
 
 enum GDOOperationType {
   Insert, Retain, Delete
@@ -236,6 +237,14 @@ const int NULL_ENUM_VALUE = 15;
   };
 }
 
+- (unsigned long long)length {
+  unsigned long long length = 0;
+  for (GDOPBDelta_Operation *op in self.opsArray) {
+    length += [GDOOperationIterator length:op];
+  }
+  return length;
+}
+
 - (GDOPBDelta *(^)(GDOPBDelta *other, BOOL priority))transform {
   return ^GDOPBDelta *(GDOPBDelta *other, BOOL priority) {
       return nil;
@@ -253,8 +262,9 @@ const int NULL_ENUM_VALUE = 15;
         GDOPBDelta_Operation *thisOp = iter.peek;
         NSInteger index = NSNotFound;
         if (thisOp.insert.length) {
-          unsigned long long start = [GDOOperationIterator length:thisOp] - iter.peekLength;
-          NSRange range = [thisOp.insert rangeOfString:newline options:0 range:NSMakeRange(start, NSUIntegerMax)];
+          unsigned long long length = iter.peekLength;
+          unsigned long long start = [GDOOperationIterator length:thisOp] - length;
+          NSRange range = [thisOp.insert rangeOfString:newline options:0 range:NSMakeRange(start, length)];
           index = range.location;
         }
         if (index == NSNotFound) {

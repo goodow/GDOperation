@@ -21,4 +21,6 @@ extern const int NULL_ENUM_VALUE;
 
 - (void (^)(BOOL (^predicate)(GDOPBDelta *line, GDOPBAttribute *attributes, int i), NSString *newline))eachLine;
 
+- (unsigned long long)length;
+
 @end

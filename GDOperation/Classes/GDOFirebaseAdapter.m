@@ -134,7 +134,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
   for (NSDictionary *o in ops) {
     NSMutableDictionary *op = o.mutableCopy;
     [toRtn addObject:op];
-    if (![op[@"insert"] isKindOfClass:NSString.class]) {
+    if (op[@"insert"] && ![op[@"insert"] isKindOfClass:NSString.class]) {
       op[@"insertEmbed"] = op[@"insert"];
       [op removeObjectForKey:@"insert"];
     }
