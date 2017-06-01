@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="JWp-WG-kzC">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11542" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="BKF-QZ-G0y">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
@@ -36,6 +36,22 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="rn5-FW-fE8" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
         </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="dFb-k3-PHB">
+            <objects>
+                <navigationController id="BKF-QZ-G0y" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="9wI-Un-Wrv">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="JWp-WG-kzC" kind="relationship" relationship="rootViewController" id="qRY-OJ-2Ts"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Zfl-5A-bZo" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-631" y="719"/>
+        </scene>
         <!--Text View Controller-->
         <scene sceneID="80T-sL-ZPk">
             <objects>
@@ -47,12 +63,26 @@
                     <view key="view" contentMode="scaleToFill" id="Ruk-YU-q7T">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tEe-v9-Ew7">
+                                <rect key="frame" x="154" y="97" width="67" height="30"/>
+                                <state key="normal" title="View Test"/>
+                                <connections>
+                                    <action selector="TextTest:" destination="JWp-WG-kzC" eventType="touchUpInside" id="hvv-Ou-jLC"/>
+                                </connections>
+                            </button>
+                        </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="tEe-v9-Ew7" firstAttribute="centerX" secondItem="Ruk-YU-q7T" secondAttribute="centerX" id="1Rp-0P-bzR"/>
+                            <constraint firstItem="tEe-v9-Ew7" firstAttribute="centerY" secondItem="Ruk-YU-q7T" secondAttribute="centerY" id="Ya1-GM-xTO"/>
+                        </constraints>
                     </view>
+                    <navigationItem key="navigationItem" id="8tA-dv-mYJ"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yr9-fw-fGX" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="125.59999999999999" y="798.35082458770626"/>
+            <point key="canvasLocation" x="156" y="718"/>
         </scene>
     </scenes>
 </document>

@@ -3,56 +3,65 @@
 //
 
 #import <objc/runtime.h>
-#import "GDOTextView.h"
+#import "GDOYYTextView.h"
 #import "GoodowOperation.pbobjc.h"
 #import "GDCBusProvider.h"
 #import "NSObject+GDChannel.h"
 #import "GDOAttributedStringUtil.h"
 #import "GDORichText.h"
 
+#import "YYTextView.h"
+#import "NSAttributedString+YYText.h"
+
 static const char kAttachmentKey = 0;
 static const char kRichTextKey = 0;
 
-@interface GDOTextView () <UITextViewDelegate>
-@property(nonatomic, weak) UITextView *textView;
+@interface GDOYYTextView () <YYTextViewDelegate>
+@property(nonatomic, weak) YYTextView *textView;
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
 @property (nonatomic, strong) GDOPBDelta *delta;
 
 @end
 
-@implementation GDOTextView {
+@implementation GDOYYTextView {
 
 }
 
-+ (GDORichText *(^)(UITextView *textView))attachView {
-  return ^GDORichText *(UITextView *textView) {
-      return [[GDORichText alloc] initWithEditor:[[GDOTextView alloc] initWithTextView:textView]];
++ (GDORichText *(^)(YYTextView *textView))attachView {
+  return ^GDORichText *(YYTextView *textView) {
+    return [[GDORichText alloc] initWithEditor:[[GDOYYTextView alloc] initWithTextView:textView]];
   };
 }
 
-- (instancetype)initWithTextView:(UITextView *)textView {
+- (instancetype)initWithTextView:(YYTextView *)textView {
   self = [super init];
   if (self) {
     _textView = textView;
     _textView.delegate = self;
-    objc_setAssociatedObject(_textView, &kRichTextKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(_textView, &kRichTextKey,self , OBJC_ASSOCIATION_RETAIN_NONATOMIC);//让view持有self,避免被释放掉
     _attributedText = [[NSMutableAttributedString alloc] initWithString:@"\n"];
     _delta = GDOPBDelta.message.insert(@"\n", nil);
   }
   return self;
 }
-
+-(void)dealloc{
+  NSLog(@"dellocate");
+}
 - (GDOPBDelta *(^)(GDOPBDelta *delta))applyDelta {
   return ^GDOPBDelta *(GDOPBDelta *delta) {
-      [self apply:delta];
-      [self update];
-      self.delta = self.delta.compose(delta);
-      return nil;
+    [self apply:delta];
+    [self update];
+    self.delta = self.delta.compose(delta);
+    return nil;
   };
 }
-//-(void)dealloc{
-//  NSLog(@"dellocate");
-//}
+-(void)setImage:(UIImage*)image withView:(UIView*)view{
+  if ([view isKindOfClass:[UIImageView class]]) {
+    [(UIImageView*)view setImage:image];
+  } else {
+    [(UIButton*)view setBackgroundImage:image forState:UIControlStateNormal];
+  }
+}
 #pragma mark - Internal methods
 
 // 根据delta更新attributedText
@@ -135,54 +144,57 @@ static const char kRichTextKey = 0;
           cursor += 1;
         }
       } else if (op.insertEmbed.image || op.insertEmbed.button) {
-        NSString *imageName = [op.insertEmbed.image length] ? op.insertEmbed.image : op.insertEmbed.button;
-        NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
+        NSString *imageName;
+        UIView *view ;
+        if ([op.insertEmbed.image length]) {
+          imageName = op.insertEmbed.image;
+          view = [UIImageView new];
+          view.userInteractionEnabled = YES;
+          UITapGestureRecognizer *tap =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(imageTaped:)];
+          [view addGestureRecognizer:tap];
+        } else {
+          imageName = op.insertEmbed.button;
+          view = [UIButton new];
+          [(UIButton*)view addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
+        }
+        if ([GDOAttributedStringUtil sizeFromString:op.attributes.width]&& [GDOAttributedStringUtil sizeFromString:op.attributes.height]) {
+          view.bounds = CGRectMake(0, 0,[GDOAttributedStringUtil sizeFromString:op.attributes.width] , [GDOAttributedStringUtil sizeFromString:op.attributes.height]);
+        }
+        YYTextAttachment *attach = [[YYTextAttachment alloc] init];
+        attach.content = view;
+        if ([op.attributes.link length]) {
+          objc_setAssociatedObject(view, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+        }
+        attach.contentMode = UIViewContentModeCenter;
+
+
+        NSMutableAttributedString *attr9 = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
+        [attr9 yy_setTextAttachment:attach range:NSMakeRange(0, attr9.length)];
         UIImage *image = [UIImage imageNamed:imageName];
         if (image) {
-          textAttachment.image = image;
+          [self setImage:image withView:view];
         } else {
           NSURL *url = [NSURL URLWithString:imageName];
           __weak typeof(self) weakSelf = self;
+          __weak typeof(view) weakView = view;
           NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-              if (!error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    textAttachment.image = [UIImage imageWithData:data];
-                    [weakSelf update];
-                });
-              } else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    textAttachment.image = [UIImage new];
-                    [weakSelf update];
-                });
-              }
+            if (!error) {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf setImage:[UIImage imageWithData:data] withView:weakView];
+                [weakSelf update];
+              });
+            } else {
+              dispatch_async(dispatch_get_main_queue(), ^{
+                //view.image = [UIImage new];
+                [weakSelf update];
+              });
+            }
           }];
           [task resume];
         }
-        if ([GDOAttributedStringUtil sizeFromString:op.attributes.width] && [GDOAttributedStringUtil sizeFromString:op.attributes.height]) {
-          textAttachment.bounds = CGRectMake(0, 0, [GDOAttributedStringUtil sizeFromString:op.attributes.width], [GDOAttributedStringUtil sizeFromString:op.attributes.height]);
-        }
 
-
-
-        NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
-        [self.attributedText insertAttributedString:attr9 atIndex:cursor];
-        if ([op.attributes.link length]) {
-          [self.attributedText addAttribute:@"userlink" value:op.attributes.link range:NSMakeRange(cursor, 1)];
-        }
-
-        cursor += 1;
-        // other implementation
-        //        cursor += 1;
-      } else if (op.insertEmbed.video) {
-        NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-        textAttachment.image = [UIImage imageNamed:op.insertEmbed.video];
-        textAttachment.contents = [UIImage imageNamed:op.insertEmbed.video];
-        NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
         [self.attributedText insertAttributedString:attr9 atIndex:cursor];
         cursor += 1;
-
-        // other implementation
-        //        cursor += 1;
       }
       continue;
     }
@@ -195,27 +207,36 @@ static const char kRichTextKey = 0;
 }
 
 
-#pragma mark - UITextViewDelegate
+#pragma mark - YYTextViewDelegate
 
 // textView回调，用于跳转富文本中的超链接
-- (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)url inRange:(NSRange)characterRange {
+- (BOOL)textView:(YYTextView *)textView shouldInteractWithURL:(NSURL *)url inRange:(NSRange)characterRange {
   NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
   [self.bus publishLocal:topic payload:url.absoluteString];
   return NO;
 }
 
-- (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
-
-  NSString *attachLink = [self.attributedText attribute:@"userlink" atIndex:characterRange.location longestEffectiveRange:nil inRange:characterRange];
+//按钮回调
+-(void)buttonClicked:(UIButton*)btn{
+  NSString *attachLink = objc_getAssociatedObject(btn, &kAttachmentKey);
   if ([attachLink length]) {
     NSString *clientId = [GDCBusProvider clientId];
     NSString *topic = [NSString stringWithFormat:@"%@/actions/views", clientId];
     [self.bus publishLocal:topic payload:attachLink];
   }
-  return NO;
 }
 
-- (void)textViewDidChangeSelection:(UITextView *)textView {
+//iamge回调
+-(void)imageTaped:(UITapGestureRecognizer*)tap{
+  NSString *attachLink = objc_getAssociatedObject([tap view], &kAttachmentKey);
+  if ([attachLink length]) {
+    NSString *clientId = [GDCBusProvider clientId];
+    NSString *topic = [NSString stringWithFormat:@"%@/actions/views", clientId];
+    [self.bus publishLocal:topic payload:attachLink];
+  }
+}
+
+- (void)textViewDidChangeSelection:(YYTextView *)textView {
   // 该方法禁止textView被select时的高亮（因为[textView:shouldInteractWithURL:inRange:]方法必须在textView是selectable时生效）
   if (!NSEqualRanges(textView.selectedRange, NSMakeRange(0, 0))) {
     textView.selectedRange = NSMakeRange(0, 0);

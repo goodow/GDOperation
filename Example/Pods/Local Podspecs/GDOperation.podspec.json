@@ -44,7 +44,7 @@
     {
       "name": "Firebase",
       "dependencies": {
-        "GDOperation/Core": [
+        "GDOperation/YYText": [
 
         ]
       },
