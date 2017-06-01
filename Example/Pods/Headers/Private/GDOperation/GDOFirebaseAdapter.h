@@ -1,1 +1,1 @@
-../../../../../GDOperation/Classes/GDOFirebaseAdapter.h
+../../../../../GDOperation/Classes/Firebase/GDOFirebaseAdapter.h

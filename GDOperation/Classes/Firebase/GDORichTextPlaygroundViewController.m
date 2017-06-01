@@ -101,14 +101,16 @@
       break;
     case 5:
       cell.textLabel.numberOfLines = 0;
-      cell.textLabel.text = self.delta.toJson.description;
+      cell.textLabel.font = [cell.textLabel.font fontWithSize:10];
+      cell.textLabel.text = [GDORichTextPlaygroundViewController prettyPrintJson:self.delta.toJson];
       break;
     case 6:
       cell.textLabel.text = @"文档:";
       break;
     case 7:
       cell.textLabel.numberOfLines = 0;
-      cell.textLabel.text = self.contents.toJson.description;
+      cell.textLabel.font = [cell.textLabel.font fontWithSize:10];
+      cell.textLabel.text = [GDORichTextPlaygroundViewController prettyPrintJson:self.contents.toJson];
       break;
     default:
       break;
@@ -117,6 +119,15 @@
   [cell setNeedsUpdateConstraints];
   [cell updateConstraintsIfNeeded];
   return cell;
+}
+
+
++ (NSString *)prettyPrintJson :(id)jsonObject{
+  if (!jsonObject) {
+    return nil;
+  }
+  NSData *prettyJsonData = [NSJSONSerialization dataWithJSONObject:jsonObject options:NSJSONWritingPrettyPrinted error:nil];
+  return [NSString stringWithUTF8String:prettyJsonData.bytes];
 }
 
 @end

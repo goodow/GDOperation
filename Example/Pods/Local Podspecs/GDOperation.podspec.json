@@ -36,9 +36,19 @@
         "GDOperation/Classes/**/*"
       ],
       "source_files": [
-        "GDOperation/Classes/**/*",
+        "GDOperation/Classes/*",
+        "GDOperation/Classes/AttributedString/**/*",
         "GDOperation/Generated/**/*"
       ]
+    },
+    {
+      "name": "Firebase",
+      "dependencies": {
+        "GDOperation/Core": [
+
+        ]
+      },
+      "source_files": "GDOperation/Classes/Firebase/**/*"
     },
     {
       "name": "YYText",

@@ -1,1 +1,1 @@
-../../../../../GDOperation/Classes/GDOAttributedStringUtil.h
+../../../../../GDOperation/Classes/AttributedString/GDOAttributedStringUtil.h

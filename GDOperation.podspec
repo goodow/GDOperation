@@ -33,10 +33,15 @@ TODO: Add long description of the pod here.
   s.subspec 'Core' do |sp|
     s.dependency 'Protobuf', '~> 3.0'
     s.dependency 'GDChannel'
-    s.dependency 'Firebase/Database'
 
     sp.requires_arc = ['GDOperation/Classes/**/*']
-    sp.source_files = 'GDOperation/Classes/**/*', 'GDOperation/Generated/**/*'
+    sp.source_files = 'GDOperation/Classes/*', 'GDOperation/Classes/AttributedString/**/*', 'GDOperation/Generated/**/*'
+  end
+
+  s.subspec 'Firebase' do |sp|
+    sp.dependency 'GDOperation/Core'
+    s.dependency 'Firebase/Database'
+    sp.source_files = 'GDOperation/Classes/Firebase/**/*'
   end
 
   s.subspec 'YYText' do |sp|
