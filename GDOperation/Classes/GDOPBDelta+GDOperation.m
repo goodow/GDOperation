@@ -112,6 +112,7 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
 }
 
 + (GDOPBAttribute *)attributesCompose:(GDOPBAttribute *)attributes1 with:(GDOPBAttribute *)attributes2 keepNull:(BOOL)keepNull {
+  BOOL isEmtpy = !attributes1 && !attributes2;
   attributes1 = attributes1 ?: GDOPBAttribute.message;
   attributes2 = attributes2 ?: GDOPBAttribute.message;
   GDOPBAttribute *attributes = attributes1.copy;
@@ -127,15 +128,17 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
             case GPBDataTypeString:
               if ([NULL_SENTINEL_CHARACTER isEqualToString:[attributes valueForKey:field.name]]) {
                 GPBClearMessageField(attributes, field);
+                continue;
               }
               break;
             case GPBDataTypeEnum: {
               int32_t rawValue = GPBGetMessageInt32Field(attributes, field);
               if (NULL_ENUM_VALUE == rawValue || ([field.enumDescriptor.name isEqualToString:GDOPBAttribute_Bool_EnumDescriptor().name] && rawValue == GDOPBAttribute_Bool_False)) {
                 GPBClearMessageField(attributes, field);
+                continue;
               }
-            }
               break;
+            }
             default:
               break;
           }
@@ -147,15 +150,19 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
               [extras removeObjectForKey:key];
             }
           }
-        }
+          if (!extras.count) {
+            continue;
+          }
           break;
+        }
         case GPBFieldTypeRepeated:
         default:
           break;
       }
+      isEmtpy = NO;
     }
   }
-  return attributes;
+  return isEmtpy ? nil : attributes;
 }
 
 + (GDOPBAttribute *)attributesTransform:(GDOPBAttribute *)attributes1 with:(GDOPBAttribute *)attributes2 priority:(BOOL)priority {
@@ -222,7 +229,8 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
               newOp.insert = thisOp.insert;
             }
             // Preserve null when composing with a retain, otherwise remove it for inserts
-            newOp.attributes = [GDOOperationIterator attributesCompose:thisOp.attributes with:otherOp.attributes keepNull:thisOp.retain_p];
+            GDOPBAttribute *attributes = [GDOOperationIterator attributesCompose:thisOp.hasAttributes ? thisOp.attributes : nil with:otherOp.hasAttributes ? otherOp.attributes : nil keepNull:thisOp.retain_p];
+            if (attributes) { newOp.attributes = attributes; }
             delta.push(newOp);
             // Other op should be delete, we could be an insert or retain
             // Insert + delete cancels out
@@ -258,14 +266,16 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
       while (iter.hasNext) {
         if (iter.peekType != Insert) return;
         GDOPBDelta_Operation *thisOp = iter.peek;
-        NSInteger index = NSNotFound;
+        NSInteger index = -1;
         if (thisOp.insert.length) {
           unsigned long long length = iter.peekLength;
           unsigned long long start = [GDOOperationIterator length:thisOp] - length;
           NSRange range = [thisOp.insert rangeOfString:newline options:0 range:NSMakeRange(start, length)];
-          index = range.location;
+          if (range.location != NSNotFound) {
+            index = range.location - start;
+          }
         }
-        if (index == NSNotFound) {
+        if (index < 0) {
           line.push([iter next:0]);
         } else if (index > 0) {
           line.push([iter next:index]);

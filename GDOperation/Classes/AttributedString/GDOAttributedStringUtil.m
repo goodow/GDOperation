@@ -28,7 +28,7 @@
       }
       return YES;
   };
-  BOOL (^hasBoolValue)(NSString *, GDOPBAttribute_Bool *) = ^(NSString *key, GDOPBAttribute_Bool *value) {
+  BOOL (^hasBoolValue)(NSString *, GDOPBAttribute_Bool) = ^(NSString *key, GDOPBAttribute_Bool value) {
       if (value == 0) {
         return NO;
       }
@@ -201,6 +201,6 @@
   if (size == 12) {
     return nil;
   }
-  return [NSString stringWithFormat:@"", size, @"px"];
+  return [NSString stringWithFormat:@"%f%@", size, @"px"];
 }
 @end

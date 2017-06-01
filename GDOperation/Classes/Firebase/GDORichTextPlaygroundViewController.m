@@ -77,9 +77,9 @@
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"textView"];
         [cell.contentView addSubview:self.textView];
         [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
-            @"H:|-0-[view]-0-|"                                                  options:0 metrics:nil views:@{@"view" : self.textView}]];
+            @"H:|-0-[view]-0-|"                                                  options:0 metrics:nil views:@{@"view": self.textView}]];
         [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
-            @"V:|-0-[view]-0@750-|"                                                      options:0 metrics:nil views:@{@"view" : self.textView}]];
+            @"V:|-0-[view]-0@750-|"                                              options:0 metrics:nil views:@{@"view": self.textView}]];
         self.heightConstraint = [NSLayoutConstraint constraintWithItem:self.textView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:44];
         [self.textView addConstraint:self.heightConstraint];
       }
@@ -99,19 +99,21 @@
     case 4:
       cell.textLabel.text = @"差量:";
       break;
-    case 5:
+    case 5: {
       cell.textLabel.numberOfLines = 0;
-      cell.textLabel.font = [cell.textLabel.font fontWithSize:10];
       cell.textLabel.text = [GDORichTextPlaygroundViewController prettyPrintJson:self.delta.toJson];
+      cell.textLabel.font = [cell.textLabel.font fontWithSize:10];
       break;
+    }
     case 6:
       cell.textLabel.text = @"文档:";
       break;
-    case 7:
+    case 7: {
       cell.textLabel.numberOfLines = 0;
-      cell.textLabel.font = [cell.textLabel.font fontWithSize:10];
       cell.textLabel.text = [GDORichTextPlaygroundViewController prettyPrintJson:self.contents.toJson];
+      cell.textLabel.font = [cell.textLabel.font fontWithSize:10];
       break;
+    }
     default:
       break;
   }
@@ -121,13 +123,14 @@
   return cell;
 }
 
-
-+ (NSString *)prettyPrintJson :(id)jsonObject{
++ (NSString *)prettyPrintJson:(id)jsonObject {
   if (!jsonObject) {
     return nil;
   }
-  NSData *prettyJsonData = [NSJSONSerialization dataWithJSONObject:jsonObject options:NSJSONWritingPrettyPrinted error:nil];
-  return [NSString stringWithUTF8String:prettyJsonData.bytes];
+  NSError *error = nil;
+  NSData *prettyJsonData = [NSJSONSerialization dataWithJSONObject:jsonObject options:NSJSONWritingPrettyPrinted error:&error];
+  return error ? error.description : [[NSString alloc] initWithData:prettyJsonData encoding:NSUTF8StringEncoding];
+//  return [NSString stringWithUTF8String:prettyJsonData.bytes];
 }
 
 @end
