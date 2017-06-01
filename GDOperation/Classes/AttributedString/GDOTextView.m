@@ -9,14 +9,14 @@
 #import "NSObject+GDChannel.h"
 #import "GDOAttributedStringUtil.h"
 #import "GDORichText.h"
+#import "GDOLabel.h"
 
-static const char kAttachmentKey = 0;
 static const char kRichTextKey = 0;
 
 @interface GDOTextView () <UITextViewDelegate>
 @property(nonatomic, weak) UITextView *textView;
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
-@property (nonatomic, strong) GDOPBDelta *delta;
+@property(nonatomic, strong) GDOPBDelta *delta;
 
 @end
 
@@ -47,12 +47,10 @@ static const char kRichTextKey = 0;
       [self apply:delta];
       [self update];
       self.delta = self.delta.compose(delta);
-      return nil;
+      return delta;
   };
 }
-//-(void)dealloc{
-//  NSLog(@"dellocate");
-//}
+
 #pragma mark - Internal methods
 
 // 根据delta更新attributedText
@@ -61,54 +59,22 @@ static const char kRichTextKey = 0;
   for (GDOPBDelta_Operation *op in delta.opsArray) { // 遍历富文本片段
     if (op.insert.length) { // 有文本信息
       NSString *text = op.insert;
+      NSAttributedString *string = nil;
       if (![text isEqualToString:@"\n"]) { // 不是换行段落
-        NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
-        NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:attr];
-        [self.attributedText insertAttributedString:str atIndex:cursor];
-        if (op.attributes.link.length) {
-          self.textView.linkTextAttributes = attr;
-        }
+        string = [self insertText:op];
       } else { // 换行段落
-        NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
-        long lineStart = 0;
-        if (range.location != NSNotFound) {
-          lineStart = range.location + 1;
-        }
-        [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:@"\n"] atIndex:cursor];
-        NSMutableParagraphStyle *paragraphStyle = nil;
-        if (cursor && ((lineStart) < self.attributedText.length)) {
-          paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
-        }
-        paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
-        if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
-          [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor + 1 - lineStart)];
-        }
+        string = [self insertNewParagraph:cursor op:op];
       }
+      [self.attributedText insertAttributedString:string atIndex:cursor];
       cursor += text.length;
       continue;
     }
 
     if (op.retain_p > 0) {
       if ([self.attributedText.string characterAtIndex:cursor] != '\n') {
-        NSArray *toRemove;
-        NSDictionary<NSString *, id> *attrs = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:&toRemove];
-        if (attrs.count) {
-          [self.attributedText addAttributes:attrs range:NSMakeRange(cursor, op.retain_p)];
-        }
-        for (NSString *key in toRemove) {
-          [self.attributedText removeAttribute:key range:NSMakeRange(cursor, op.retain_p)];
-        }
+        [self retainText:cursor op:op];
       } else {
-        NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor == 0 ? 0 : cursor - 1)];
-        long lineStart = 0;
-        if (range.location != NSNotFound) {
-          lineStart = range.location + 1;
-        }
-        NSMutableParagraphStyle *paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
-        paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
-        if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
-          [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
-        }
+        [self retainParagraph:cursor op:op];
       }
       cursor += op.retain_p;
       continue;
@@ -120,73 +86,102 @@ static const char kRichTextKey = 0;
     }
 
     if (op.hasInsertEmbed) {
-      if (op.insertEmbed.space) {
-        if (([GDOAttributedStringUtil sizeFromString:op.attributes.width] > 0) || ([GDOAttributedStringUtil sizeFromString:op.attributes.height] > 0)) {
-          NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-          textAttachment.image = [UIImage new];
-          CGFloat width = [GDOAttributedStringUtil sizeFromString:op.attributes.width] ?: 0.1;
-          CGFloat height = [GDOAttributedStringUtil sizeFromString:op.attributes.height] ?: 0.1;
-          textAttachment.bounds = CGRectMake(0, 0, width, height);
-          if ([op.attributes.link length]) {
-            objc_setAssociatedObject(textAttachment, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-          }
-          NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
-          [self.attributedText insertAttributedString:attr9 atIndex:cursor];
-          cursor += 1;
-        }
-      } else if (op.insertEmbed.image || op.insertEmbed.button) {
-        NSString *imageName = [op.insertEmbed.image length] ? op.insertEmbed.image : op.insertEmbed.button;
-        NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-        UIImage *image = [UIImage imageNamed:imageName];
-        if (image) {
-          textAttachment.image = image;
-        } else {
-          NSURL *url = [NSURL URLWithString:imageName];
-          __weak typeof(self) weakSelf = self;
-          NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-              if (!error) {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    textAttachment.image = [UIImage imageWithData:data];
-                    [weakSelf update];
-                });
-              } else {
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    textAttachment.image = [UIImage new];
-                    [weakSelf update];
-                });
-              }
-          }];
-          [task resume];
-        }
-        if ([GDOAttributedStringUtil sizeFromString:op.attributes.width] && [GDOAttributedStringUtil sizeFromString:op.attributes.height]) {
-          textAttachment.bounds = CGRectMake(0, 0, [GDOAttributedStringUtil sizeFromString:op.attributes.width], [GDOAttributedStringUtil sizeFromString:op.attributes.height]);
-        }
-
-
-
-        NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
-        [self.attributedText insertAttributedString:attr9 atIndex:cursor];
-        if ([op.attributes.link length]) {
-          [self.attributedText addAttribute:@"userlink" value:op.attributes.link range:NSMakeRange(cursor, 1)];
-        }
-
-        cursor += 1;
-        // other implementation
-        //        cursor += 1;
-      } else if (op.insertEmbed.video) {
-        NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-        textAttachment.image = [UIImage imageNamed:op.insertEmbed.video];
-        textAttachment.contents = [UIImage imageNamed:op.insertEmbed.video];
-        NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
-        [self.attributedText insertAttributedString:attr9 atIndex:cursor];
-        cursor += 1;
-
-        // other implementation
-        //        cursor += 1;
+      NSAttributedString *string = nil;
+      if (op.insertEmbed.image.length) {
+        string = [self insertImageEmbed:cursor op:op];
+      } else if (op.insertEmbed.space) {
+        string = [GDOLabel createSpaceEmbed:op];
       }
-      continue;
+      if (string) {
+        [self.attributedText insertAttributedString:string atIndex:cursor];
+      }
+      cursor += 1;
     }
   }
+}
+
+- (NSAttributedString *)insertText:(GDOPBDelta_Operation *)op {
+  NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
+  if (op.attributes.link.length) {
+    self.textView.linkTextAttributes = attr;
+  }
+  return [[NSAttributedString alloc] initWithString:op.insert attributes:attr];
+}
+
+- (void)retainText:(long)cursor op:(GDOPBDelta_Operation *)op {
+  NSArray *toRemove;
+  NSDictionary<NSString *, id> *attrs = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:&toRemove];
+  if (attrs.count) {
+    [self.attributedText addAttributes:attrs range:NSMakeRange(cursor, op.retain_p)];
+  }
+  for (NSString *key in toRemove) {
+    [self.attributedText removeAttribute:key range:NSMakeRange(cursor, op.retain_p)];
+  }
+}
+
+- (NSAttributedString *)insertNewParagraph:(long)cursor op:(GDOPBDelta_Operation *)op {
+  NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
+  long lineStart = 0;
+  if (range.location != NSNotFound) {
+    lineStart = range.location + 1;
+  }
+  [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:@"\n"] atIndex:cursor];
+  NSMutableParagraphStyle *paragraphStyle = nil;
+  if (cursor && lineStart < self.attributedText.length) {
+    paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
+  }
+  paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
+  if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
+    [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart)];
+  }
+  return [[NSAttributedString alloc] initWithString:@"\n" attributes:@{NSParagraphStyleAttributeName : paragraphStyle}];
+}
+
+- (void)retainParagraph:(long)cursor op:(GDOPBDelta_Operation *)op {
+  NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor == 0 ? 0 : cursor - 1)];
+  long lineStart = 0;
+  if (range.location != NSNotFound) {
+    lineStart = range.location + 1;
+  }
+  NSMutableParagraphStyle *paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
+  paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
+  if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
+    [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
+  }
+}
+
+- (NSAttributedString *)insertImageEmbed:(long)cursor op:(GDOPBDelta_Operation *)op {
+  NSString *imageName = [op.insertEmbed.image length] ? op.insertEmbed.image : op.insertEmbed.button;
+  NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
+  UIImage *image = [UIImage imageNamed:imageName];
+  if (image) {
+    textAttachment.image = image;
+  } else {
+    NSURL *url = [NSURL URLWithString:imageName];
+    __weak typeof(self) weakSelf = self;
+    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (!error) {
+          dispatch_async(dispatch_get_main_queue(), ^{
+              textAttachment.image = [UIImage imageWithData:data];
+              [weakSelf update];
+          });
+        } else {
+          dispatch_async(dispatch_get_main_queue(), ^{
+              textAttachment.image = [UIImage new];
+              [weakSelf update];
+          });
+        }
+    }];
+    [task resume];
+  }
+  if ([GDOAttributedStringUtil sizeFromString:op.attributes.width] && [GDOAttributedStringUtil sizeFromString:op.attributes.height]) {
+    textAttachment.bounds = CGRectMake(0, 0, [GDOAttributedStringUtil sizeFromString:op.attributes.width], [GDOAttributedStringUtil sizeFromString:op.attributes.height]);
+  }
+
+  if ([op.attributes.link length]) {
+    [self.attributedText addAttribute:@"userlink" value:op.attributes.link range:NSMakeRange(cursor, 1)];
+  }
+  return [NSAttributedString attributedStringWithAttachment:textAttachment];
 }
 
 - (void)update {
@@ -205,11 +200,9 @@ static const char kRichTextKey = 0;
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
-
   NSString *attachLink = [self.attributedText attribute:@"userlink" atIndex:characterRange.location longestEffectiveRange:nil inRange:characterRange];
   if ([attachLink length]) {
-    NSString *clientId = [GDCBusProvider clientId];
-    NSString *topic = [NSString stringWithFormat:@"%@/actions/views", clientId];
+    NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
     [self.bus publishLocal:topic payload:attachLink];
   }
   return NO;

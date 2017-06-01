@@ -66,9 +66,9 @@
       NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
       string = [[NSAttributedString alloc] initWithString:text attributes:attr];
     } else if (op.insertEmbed.image) {
-      string = [self createImageEmbed:op];
+      string = [self.class createImageEmbed:op];
     } else if (op.insertEmbed.space) {
-      string = [self createSpaceEmbed:op];
+      string = [self.class createSpaceEmbed:op];
     }
     if (string) {
       [self.attributedText appendAttributedString:string];
@@ -90,7 +90,7 @@
   }
 }
 
-- (NSAttributedString *)createImageEmbed:(GDOPBDelta_Operation *)op {
++ (NSAttributedString *)createImageEmbed:(GDOPBDelta_Operation *)op {
   NSString *imageString = op.insertEmbed.image;
   NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
   UIImage *image = [UIImage imageNamed:imageString];
@@ -118,7 +118,7 @@
   return [NSAttributedString attributedStringWithAttachment:textAttachment];
 }
 
-- (NSAttributedString *)createSpaceEmbed:(GDOPBDelta_Operation *)op {
++ (NSAttributedString *)createSpaceEmbed:(GDOPBDelta_Operation *)op {
   CGFloat width = [GDOAttributedStringUtil sizeFromString:op.attributes.width];
   CGFloat height = [GDOAttributedStringUtil sizeFromString:op.attributes.height];
   if (width <= 0 && height <= 0) {

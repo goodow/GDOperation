@@ -4,9 +4,10 @@
 
 #import <Foundation/Foundation.h>
 #import "GDOEditor.h"
+#import "YYTextView.h"
 
 @interface GDOYYTextView : NSObject <GDOEditor>
 
-+ (GDORichText *(^)(UITextView *textView))attachView;
++ (GDORichText *(^)(YYTextView *textView))attachView;
 
 @end

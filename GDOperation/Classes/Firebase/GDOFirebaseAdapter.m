@@ -54,7 +54,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
           GDOPBDelta *delta = [weak parseRevision:ops];
           if (!delta) {
             // If a misbehaved client adds a bad operation, just ignore it.
-            NSLog(@"Invalid operation. %@, %@, %@", self.ref, revisionId, snapshot.value);
+            NSLog(@"Invalid operation. %@, %@, %@", weak.ref, revisionId, snapshot.value);
           }
           weak.pendingReceivedRevisions[revisionId] = delta;
           weak.checkpointRevision = [GDOFirebaseAdapter revisionFromId:revisionId];
@@ -75,7 +75,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
       NSArray *ops = [GDOFirebaseAdapter canonicalizeOps:revisionSnapshot.value[@"o"] replaceNullAttribute:YES];
       GDOPBDelta *delta = [weak parseRevision:ops];
       if (!delta) {
-        NSLog(@"Invalid operation. %@, %@, %@", self.ref, revisionId, revisionSnapshot.value);
+        NSLog(@"Invalid operation. %@, %@, %@", weak.ref, revisionId, revisionSnapshot.value);
       }
       weak.pendingReceivedRevisions[revisionId] = delta;
       if (weak.ready) {
@@ -142,8 +142,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
       continue;
     }
     NSMutableDictionary *attributes = [op[@"attributes"] mutableCopy];
-    op[@"attributes"] = attributes;
-    for (NSString *key in attributes) {
+    for (NSString *key in op[@"attributes"]) {
       if ([@[@"bold", @"italic", @"underline", @"strike", @"code"] containsObject:key]) {
         if (![NULL_SENTINEL_CHARACTER isEqualToString:attributes[key]]) {
           continue;
@@ -156,6 +155,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
         attributes[key] = @(NULL_ENUM_VALUE);
       }
     }
+    op[@"attributes"] = attributes;
   }
   return toRtn;
 }

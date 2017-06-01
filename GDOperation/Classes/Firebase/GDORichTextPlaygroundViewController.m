@@ -19,12 +19,14 @@
 @interface GDORichTextPlaygroundViewController ()
 @property(strong) GDOPBDelta *delta;
 @property(strong) GDOPBDelta *contents;
+@property(nonatomic, strong) GDOFirebaseAdapter *adapter;
 @property(nonatomic, strong) UITextView *textView;
 @property(nonatomic, strong) GDORichText *richText;
 @property(nonatomic, strong) NSLayoutConstraint *heightConstraint;
-@property(nonatomic, strong) YYTextView *yytextView;
-@property(nonatomic, strong) GDORichText *yyrichText;
-@property(nonatomic, strong) NSLayoutConstraint *yyheightConstraint;
+
+@property(nonatomic, strong) YYTextView *yyTextView;
+@property(nonatomic, strong) GDORichText *yyRichText;
+@property(nonatomic, strong) NSLayoutConstraint *yyHeightConstraint;
 @end
 
 @implementation GDORichTextPlaygroundViewController
@@ -47,30 +49,20 @@
   self.textView.editable = NO;
   self.richText = GDOTextView.attachView(self.textView);
 
-  self.yytextView = [[YYTextView alloc] initWithFrame:CGRectZero];
-  self.yytextView.translatesAutoresizingMaskIntoConstraints = NO;
-  self.yytextView.editable = NO;
-  self.yyrichText = GDOYYTextView.attachView(self.yytextView);
-
-  NSString *dataFile = [[NSBundle mainBundle] pathForResource:@"richtext" ofType:@"json"];
-  NSData *dataj = [NSData dataWithContentsOfFile:dataFile];//[dataFile dataUsingEncoding:NSUTF8StringEncoding];
-
-  NSDictionary *json = [NSJSONSerialization JSONObjectWithData:dataj
-                                                       options:NSJSONReadingMutableContainers
-                                                         error:nil];
-
-  self.yyrichText.updateContents([GDOPBDelta parseFromJson:json error:nil]);
-  self.richText.updateContents([GDOPBDelta parseFromJson:json error:nil]);
+  self.yyTextView = [[YYTextView alloc] initWithFrame:CGRectZero];
+  self.yyTextView.translatesAutoresizingMaskIntoConstraints = NO;
+  self.yyTextView.editable = NO;
+  self.yyRichText = GDOYYTextView.attachView(self.yyTextView);
 
   FIRDatabaseReference *ref = [[FIRDatabase database] reference];
-  GDOFirebaseAdapter *adapter = [[GDOFirebaseAdapter alloc] initWithRef:[ref child:@"richText/default"]];
+  self.adapter = [[GDOFirebaseAdapter alloc] initWithRef:[ref child:@"richText/default"]];
   __weak GDORichTextPlaygroundViewController *weak = self;
-  adapter.onTextChange = ^(GDOPBDelta *delta, GDOPBDelta *contents) {
+  self.adapter.onTextChange = ^(GDOPBDelta *delta, GDOPBDelta *contents) {
       weak.delta = delta;
       weak.contents = contents;
 
-//      weak.richText.updateContents(delta);
-//      weak.yyrichText.updateContents(delta);
+      weak.richText.updateContents(delta);
+      weak.yyRichText.updateContents(delta);
       [weak.tableView reloadData];
   };
 }
@@ -113,21 +105,21 @@
     case 2:
       cell.textLabel.text = @"YYTextView 预览:";
       break;
-    case 3:{
+    case 3: {
       cell = [tableView dequeueReusableCellWithIdentifier:@"yytextView"];
       if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"yytextView"];
-        [cell.contentView addSubview:self.yytextView];
+        [cell.contentView addSubview:self.yyTextView];
         [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
-                                          @"H:|-0-[view]-0-|"                                                  options:0 metrics:nil views:@{@"view" : self.yytextView}]];
+            @"H:|-0-[view]-0-|"                                                  options:0 metrics:nil views:@{@"view": self.yyTextView}]];
         [cell.contentView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:
-                                          @"V:|-0-[view]-0@750-|"                                                      options:0 metrics:nil views:@{@"view" : self.yytextView}]];
-        self.yyheightConstraint = [NSLayoutConstraint constraintWithItem:self.yytextView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:44];
-        [self.yytextView addConstraint:self.yyheightConstraint];
+            @"V:|-0-[view]-0@750-|"                                              options:0 metrics:nil views:@{@"view": self.yyTextView}]];
+        self.yyHeightConstraint = [NSLayoutConstraint constraintWithItem:self.yyTextView attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:nil attribute:NSLayoutAttributeNotAnAttribute multiplier:1 constant:44];
+        [self.yyTextView addConstraint:self.yyHeightConstraint];
       }
 
-      CGSize size = [self.yytextView sizeThatFits:CGSizeMake(cell.bounds.size.width, MAXFLOAT)];
-      self.yyheightConstraint.constant = size.height;
+      CGSize size = [self.yyTextView sizeThatFits:CGSizeMake(cell.bounds.size.width, MAXFLOAT)];
+      self.yyHeightConstraint.constant = size.height;
       //      [cell layoutIfNeeded];
     }
       break;
