@@ -3,6 +3,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import "GoodowBool.pbobjc.h"
 #import "GoodowOperation.pbobjc.h"
 
 @interface GDOPBAttribute (FluentInterface)
@@ -12,16 +13,16 @@
 - (GDOPBAttribute *(^)(NSString *size))setSize;
 - (GDOPBAttribute *(^)(NSString *font))setFont;
 - (GDOPBAttribute *(^)(NSString *link))setLink;
-- (GDOPBAttribute *(^)(enum GDOPBAttribute_Bool bold))setBold;
-- (GDOPBAttribute *(^)(enum GDOPBAttribute_Bool italic))setItalic;
-- (GDOPBAttribute *(^)(enum GDOPBAttribute_Bool underline))setUnderline;
-- (GDOPBAttribute *(^)(enum GDOPBAttribute_Bool strike))setStrike;
-- (GDOPBAttribute *(^)(enum GDOPBAttribute_Bool code))setCode;
-- (GDOPBAttribute *(^)(enum GDOPBAttribute_Script script))setScript;
+- (GDOPBAttribute *(^)(enum GDPBBool bold))setBold;
+- (GDOPBAttribute *(^)(enum GDPBBool italic))setItalic;
+- (GDOPBAttribute *(^)(enum GDPBBool underline))setUnderline;
+- (GDOPBAttribute *(^)(enum GDPBBool strike))setStrike;
+- (GDOPBAttribute *(^)(enum GDPBBool code))setCode;
+- (GDOPBAttribute *(^)(enum GDOPBScript script))setScript;
 
 - (GDOPBAttribute *(^)(NSMutableDictionary<NSString*, NSString*> *extras))setExtras;
 
-- (GDOPBAttribute *(^)(enum GDOPBAttribute_Alignment align))setAlign;
+- (GDOPBAttribute *(^)(enum GDOPBAlignment align))setAlign;
 
 - (GDOPBAttribute *(^)(NSString *width))setWidth;
 - (GDOPBAttribute *(^)(NSString *htight))setHeight;

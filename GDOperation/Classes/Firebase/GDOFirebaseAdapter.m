@@ -4,7 +4,6 @@
 
 #import "GDOFirebaseAdapter.h"
 #import "Firebase.h"
-#import "GoodowOperation.pbobjc.h"
 #import "GDOPBDelta+GDOperation.h"
 #import "GPBMessage+JsonFormat.h"
 
@@ -148,7 +147,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
         if (![NULL_SENTINEL_CHARACTER isEqualToString:attributes[key]]) {
           continue;
         }
-        attributes[key] = @(GDOPBAttribute_Bool_False);
+        attributes[key] = @(GDPBBool_False);
       } else if ([@[@"script", @"align"] containsObject:key]) {
         if (![NULL_SENTINEL_CHARACTER isEqualToString:attributes[key]]) {
           continue;

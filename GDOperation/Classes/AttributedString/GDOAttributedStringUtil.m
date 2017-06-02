@@ -3,9 +3,7 @@
 //
 
 #import "GDOAttributedStringUtil.h"
-#import "GoodowOperation.pbobjc.h"
 #import "GDOPBDelta+GDOperation.h"
-
 
 @implementation GDOAttributedStringUtil {
 
@@ -28,11 +26,11 @@
       }
       return YES;
   };
-  BOOL (^hasBoolValue)(NSString *, GDOPBAttribute_Bool) = ^(NSString *key, GDOPBAttribute_Bool value) {
+  BOOL (^hasBoolValue)(NSString *, GDPBBool) = ^(NSString *key, GDPBBool value) {
       if (value == 0) {
         return NO;
       }
-      if (toRemove && value == GDOPBAttribute_Bool_False) {
+      if (toRemove && value == GDPBBool_False) {
         if (key) { [toRemove addObject:key]; }
         return NO;
       }
@@ -73,21 +71,21 @@
 // GDOPBAttribute样式集合转为NSAttribute的属性的字典 针对段落
 + (BOOL)parseBlockAttributes:(GDOPBAttribute *)attributes style:(NSMutableParagraphStyle *)paragraph {
   BOOL hasChange = NO;
-  GDOPBAttribute_Alignment align = GDOPBAttribute_Align_RawValue(attributes);
+  GDOPBAlignment align = GDOPBAttribute_Align_RawValue(attributes);
   if (align != 0) {
     enum NSTextAlignment textAlignment = -1;
     switch (align) {
-      case GDOPBAttribute_Alignment_Left:
+      case GDOPBAlignment_Left:
       case NULL_ENUM_VALUE:
         textAlignment = NSTextAlignmentLeft;
         break;
-      case GDOPBAttribute_Alignment_Center:
+      case GDOPBAlignment_Center:
         textAlignment = NSTextAlignmentCenter;
         break;
-      case GDOPBAttribute_Alignment_Right:
+      case GDOPBAlignment_Right:
         textAlignment = NSTextAlignmentRight;
         break;
-      case GDOPBAttribute_Alignment_Justify:
+      case GDOPBAlignment_Justify:
         textAlignment = NSTextAlignmentJustified;
         break;
       default:
@@ -147,13 +145,13 @@
       NSURL *url = attr[key];
       attribute.link = url.absoluteString;
     } else if ([key isEqualToString:NSExpansionAttributeName]) {
-      attribute.bold = GDOPBAttribute_Bool_True;
+      attribute.bold = GDPBBool_True;
     } else if ([key isEqualToString:NSObliquenessAttributeName]) {
-      attribute.italic = GDOPBAttribute_Bool_True;
+      attribute.italic = GDPBBool_True;
     } else if ([key isEqualToString:NSUnderlineStyleAttributeName]) {
-      attribute.underline = GDOPBAttribute_Bool_True;
+      attribute.underline = GDPBBool_True;
     } else if ([key isEqualToString:NSStrikethroughStyleAttributeName]) {
-      attribute.strike = GDOPBAttribute_Bool_True;
+      attribute.strike = GDPBBool_True;
     }
   }
   return attribute;

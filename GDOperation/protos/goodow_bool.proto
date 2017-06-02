@@ -4,7 +4,7 @@ package goodow.protobuf;
 option objc_class_prefix = 'GDPB';
 
 enum Bool {
-  DEFAULT = 0;
-  FALSE = 2;
-  TRUE = 1;
-}
+  DEFAULT_BOOL = 0; // 默认值
+  true = 1;
+  false = 2;
+};

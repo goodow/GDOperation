@@ -14,6 +14,7 @@
 #endif
 
  #import "GoodowOperation.pbobjc.h"
+ #import "GoodowBool.pbobjc.h"
 // @@protoc_insertion_point(imports)
 
 #pragma clang diagnostic push
@@ -22,6 +23,9 @@
 #pragma mark - GDOPBGoodowOperationRoot
 
 @implementation GDOPBGoodowOperationRoot
+
+// No extensions in the file and none of the imports (direct or indirect)
+// defined extensions, so no need to generate +extensionRegistry.
 
 @end
 
@@ -32,11 +36,93 @@ static GPBFileDescriptor *GDOPBGoodowOperationRoot_FileDescriptor(void) {
   // about thread safety of the singleton.
   static GPBFileDescriptor *descriptor = NULL;
   if (!descriptor) {
-    GPBDebugCheckRuntimeVersion();
+    GPB_DEBUG_CHECK_RUNTIME_VERSIONS();
     descriptor = [[GPBFileDescriptor alloc] initWithPackage:@"goodow.protobuf"
+                                                 objcPrefix:@"GDOPB"
                                                      syntax:GPBFileSyntaxProto3];
   }
   return descriptor;
+}
+
+#pragma mark - Enum GDOPBAlignment
+
+GPBEnumDescriptor *GDOPBAlignment_EnumDescriptor(void) {
+  static GPBEnumDescriptor *descriptor = NULL;
+  if (!descriptor) {
+    static const char *valueNames =
+        "DefaultAlignment\000Left\000Center\000Right\000Justi"
+        "fy\000";
+    static const int32_t values[] = {
+        GDOPBAlignment_DefaultAlignment,
+        GDOPBAlignment_Left,
+        GDOPBAlignment_Center,
+        GDOPBAlignment_Right,
+        GDOPBAlignment_Justify,
+    };
+    static const char *extraTextFormatInfo = "\004\001$\000\002&\000\003%\000\004\'\000";
+    GPBEnumDescriptor *worker =
+        [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(GDOPBAlignment)
+                                       valueNames:valueNames
+                                           values:values
+                                            count:(uint32_t)(sizeof(values) / sizeof(int32_t))
+                                     enumVerifier:GDOPBAlignment_IsValidValue
+                              extraTextFormatInfo:extraTextFormatInfo];
+    if (!OSAtomicCompareAndSwapPtrBarrier(nil, worker, (void * volatile *)&descriptor)) {
+      [worker release];
+    }
+  }
+  return descriptor;
+}
+
+BOOL GDOPBAlignment_IsValidValue(int32_t value__) {
+  switch (value__) {
+    case GDOPBAlignment_DefaultAlignment:
+    case GDOPBAlignment_Left:
+    case GDOPBAlignment_Center:
+    case GDOPBAlignment_Right:
+    case GDOPBAlignment_Justify:
+      return YES;
+    default:
+      return NO;
+  }
+}
+
+#pragma mark - Enum GDOPBScript
+
+GPBEnumDescriptor *GDOPBScript_EnumDescriptor(void) {
+  static GPBEnumDescriptor *descriptor = NULL;
+  if (!descriptor) {
+    static const char *valueNames =
+        "DefaultScript\000Super\000Sub\000";
+    static const int32_t values[] = {
+        GDOPBScript_DefaultScript,
+        GDOPBScript_Super,
+        GDOPBScript_Sub,
+    };
+    static const char *extraTextFormatInfo = "\002\001%\000\002#\000";
+    GPBEnumDescriptor *worker =
+        [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(GDOPBScript)
+                                       valueNames:valueNames
+                                           values:values
+                                            count:(uint32_t)(sizeof(values) / sizeof(int32_t))
+                                     enumVerifier:GDOPBScript_IsValidValue
+                              extraTextFormatInfo:extraTextFormatInfo];
+    if (!OSAtomicCompareAndSwapPtrBarrier(nil, worker, (void * volatile *)&descriptor)) {
+      [worker release];
+    }
+  }
+  return descriptor;
+}
+
+BOOL GDOPBScript_IsValidValue(int32_t value__) {
+  switch (value__) {
+    case GDOPBScript_DefaultScript:
+    case GDOPBScript_Super:
+    case GDOPBScript_Sub:
+      return YES;
+    default:
+      return NO;
+  }
 }
 
 #pragma mark - GDOPBAttribute
@@ -61,13 +147,13 @@ static GPBFileDescriptor *GDOPBGoodowOperationRoot_FileDescriptor(void) {
 
 typedef struct GDOPBAttribute__storage_ {
   uint32_t _has_storage_[1];
-  GDOPBAttribute_Bool bold;
-  GDOPBAttribute_Bool italic;
-  GDOPBAttribute_Bool underline;
-  GDOPBAttribute_Bool strike;
-  GDOPBAttribute_Bool code;
-  GDOPBAttribute_Script script;
-  GDOPBAttribute_Alignment align;
+  GDPBBool bold;
+  GDPBBool italic;
+  GDPBBool underline;
+  GDPBBool strike;
+  GDPBBool code;
+  GDOPBScript script;
+  GDOPBAlignment align;
   NSString *color;
   NSString *background;
   NSString *size;
@@ -131,56 +217,56 @@ typedef struct GDOPBAttribute__storage_ {
       },
       {
         .name = "bold",
-        .dataTypeSpecific.enumDescFunc = GDOPBAttribute_Bool_EnumDescriptor,
+        .dataTypeSpecific.enumDescFunc = GDPBBool_EnumDescriptor,
         .number = GDOPBAttribute_FieldNumber_Bold,
         .hasIndex = 5,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, bold),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
         .name = "italic",
-        .dataTypeSpecific.enumDescFunc = GDOPBAttribute_Bool_EnumDescriptor,
+        .dataTypeSpecific.enumDescFunc = GDPBBool_EnumDescriptor,
         .number = GDOPBAttribute_FieldNumber_Italic,
         .hasIndex = 6,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, italic),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
         .name = "underline",
-        .dataTypeSpecific.enumDescFunc = GDOPBAttribute_Bool_EnumDescriptor,
+        .dataTypeSpecific.enumDescFunc = GDPBBool_EnumDescriptor,
         .number = GDOPBAttribute_FieldNumber_Underline,
         .hasIndex = 7,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, underline),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
         .name = "strike",
-        .dataTypeSpecific.enumDescFunc = GDOPBAttribute_Bool_EnumDescriptor,
+        .dataTypeSpecific.enumDescFunc = GDPBBool_EnumDescriptor,
         .number = GDOPBAttribute_FieldNumber_Strike,
         .hasIndex = 8,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, strike),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
         .name = "code",
-        .dataTypeSpecific.enumDescFunc = GDOPBAttribute_Bool_EnumDescriptor,
+        .dataTypeSpecific.enumDescFunc = GDPBBool_EnumDescriptor,
         .number = GDOPBAttribute_FieldNumber_Code,
         .hasIndex = 9,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, code),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
         .name = "script",
-        .dataTypeSpecific.enumDescFunc = GDOPBAttribute_Script_EnumDescriptor,
+        .dataTypeSpecific.enumDescFunc = GDOPBScript_EnumDescriptor,
         .number = GDOPBAttribute_FieldNumber_Script,
         .hasIndex = 10,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, script),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -194,11 +280,11 @@ typedef struct GDOPBAttribute__storage_ {
       },
       {
         .name = "align",
-        .dataTypeSpecific.enumDescFunc = GDOPBAttribute_Alignment_EnumDescriptor,
+        .dataTypeSpecific.enumDescFunc = GDOPBAlignment_EnumDescriptor,
         .number = GDOPBAttribute_FieldNumber_Align,
         .hasIndex = 11,
         .offset = (uint32_t)offsetof(GDOPBAttribute__storage_, align),
-        .flags = GPBFieldOptional | GPBFieldHasEnumDescriptor,
+        .flags = (GPBFieldFlags)(GPBFieldOptional | GPBFieldHasEnumDescriptor),
         .dataType = GPBDataTypeEnum,
       },
       {
@@ -227,7 +313,7 @@ typedef struct GDOPBAttribute__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBAttribute__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -320,125 +406,6 @@ void SetGDOPBAttribute_Align_RawValue(GDOPBAttribute *message, int32_t value) {
   GPBSetInt32IvarWithFieldInternal(message, field, value, descriptor.file.syntax);
 }
 
-#pragma mark - Enum GDOPBAttribute_Bool
-
-GPBEnumDescriptor *GDOPBAttribute_Bool_EnumDescriptor(void) {
-  static GPBEnumDescriptor *descriptor = NULL;
-  if (!descriptor) {
-    static const char *valueNames =
-        "DefaultBool\000True\000False\000";
-    static const int32_t values[] = {
-        GDOPBAttribute_Bool_DefaultBool,
-        GDOPBAttribute_Bool_True,
-        GDOPBAttribute_Bool_False,
-    };
-    static const char *extraTextFormatInfo = "\002\001$\000\002%\000";
-    GPBEnumDescriptor *worker =
-        [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(GDOPBAttribute_Bool)
-                                       valueNames:valueNames
-                                           values:values
-                                            count:(uint32_t)(sizeof(values) / sizeof(int32_t))
-                                     enumVerifier:GDOPBAttribute_Bool_IsValidValue
-                              extraTextFormatInfo:extraTextFormatInfo];
-    if (!OSAtomicCompareAndSwapPtrBarrier(nil, worker, (void * volatile *)&descriptor)) {
-      [worker release];
-    }
-  }
-  return descriptor;
-}
-
-BOOL GDOPBAttribute_Bool_IsValidValue(int32_t value__) {
-  switch (value__) {
-    case GDOPBAttribute_Bool_DefaultBool:
-    case GDOPBAttribute_Bool_True:
-    case GDOPBAttribute_Bool_False:
-      return YES;
-    default:
-      return NO;
-  }
-}
-
-#pragma mark - Enum GDOPBAttribute_Alignment
-
-GPBEnumDescriptor *GDOPBAttribute_Alignment_EnumDescriptor(void) {
-  static GPBEnumDescriptor *descriptor = NULL;
-  if (!descriptor) {
-    static const char *valueNames =
-        "DefaultAlignment\000Left\000Center\000Right\000Justi"
-        "fy\000";
-    static const int32_t values[] = {
-        GDOPBAttribute_Alignment_DefaultAlignment,
-        GDOPBAttribute_Alignment_Left,
-        GDOPBAttribute_Alignment_Center,
-        GDOPBAttribute_Alignment_Right,
-        GDOPBAttribute_Alignment_Justify,
-    };
-    static const char *extraTextFormatInfo = "\004\001$\000\002&\000\003%\000\004\'\000";
-    GPBEnumDescriptor *worker =
-        [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(GDOPBAttribute_Alignment)
-                                       valueNames:valueNames
-                                           values:values
-                                            count:(uint32_t)(sizeof(values) / sizeof(int32_t))
-                                     enumVerifier:GDOPBAttribute_Alignment_IsValidValue
-                              extraTextFormatInfo:extraTextFormatInfo];
-    if (!OSAtomicCompareAndSwapPtrBarrier(nil, worker, (void * volatile *)&descriptor)) {
-      [worker release];
-    }
-  }
-  return descriptor;
-}
-
-BOOL GDOPBAttribute_Alignment_IsValidValue(int32_t value__) {
-  switch (value__) {
-    case GDOPBAttribute_Alignment_DefaultAlignment:
-    case GDOPBAttribute_Alignment_Left:
-    case GDOPBAttribute_Alignment_Center:
-    case GDOPBAttribute_Alignment_Right:
-    case GDOPBAttribute_Alignment_Justify:
-      return YES;
-    default:
-      return NO;
-  }
-}
-
-#pragma mark - Enum GDOPBAttribute_Script
-
-GPBEnumDescriptor *GDOPBAttribute_Script_EnumDescriptor(void) {
-  static GPBEnumDescriptor *descriptor = NULL;
-  if (!descriptor) {
-    static const char *valueNames =
-        "DefaultScript\000Super\000Sub\000";
-    static const int32_t values[] = {
-        GDOPBAttribute_Script_DefaultScript,
-        GDOPBAttribute_Script_Super,
-        GDOPBAttribute_Script_Sub,
-    };
-    static const char *extraTextFormatInfo = "\002\001%\000\002#\000";
-    GPBEnumDescriptor *worker =
-        [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(GDOPBAttribute_Script)
-                                       valueNames:valueNames
-                                           values:values
-                                            count:(uint32_t)(sizeof(values) / sizeof(int32_t))
-                                     enumVerifier:GDOPBAttribute_Script_IsValidValue
-                              extraTextFormatInfo:extraTextFormatInfo];
-    if (!OSAtomicCompareAndSwapPtrBarrier(nil, worker, (void * volatile *)&descriptor)) {
-      [worker release];
-    }
-  }
-  return descriptor;
-}
-
-BOOL GDOPBAttribute_Script_IsValidValue(int32_t value__) {
-  switch (value__) {
-    case GDOPBAttribute_Script_DefaultScript:
-    case GDOPBAttribute_Script_Super:
-    case GDOPBAttribute_Script_Sub:
-      return YES;
-    default:
-      return NO;
-  }
-}
-
 #pragma mark - GDOPBDelta
 
 @implementation GDOPBDelta
@@ -473,7 +440,7 @@ typedef struct GDOPBDelta__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBDelta__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -495,7 +462,7 @@ typedef struct GDOPBDelta__storage_ {
 typedef struct GDOPBDelta_Operation__storage_ {
   uint32_t _has_storage_[1];
   NSString *insert;
-  GDOPBDelta_Embed *insertEmbed;
+  GDOPBDelta_Operation_Embed *insertEmbed;
   GDOPBAttribute *attributes;
   uint64_t retain_p;
   uint64_t delete_p;
@@ -518,7 +485,7 @@ typedef struct GDOPBDelta_Operation__storage_ {
       },
       {
         .name = "insertEmbed",
-        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBDelta_Embed),
+        .dataTypeSpecific.className = GPBStringifySymbol(GDOPBDelta_Operation_Embed),
         .number = GDOPBDelta_Operation_FieldNumber_InsertEmbed,
         .hasIndex = 1,
         .offset = (uint32_t)offsetof(GDOPBDelta_Operation__storage_, insertEmbed),
@@ -560,7 +527,8 @@ typedef struct GDOPBDelta_Operation__storage_ {
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
                                    storageSize:sizeof(GDOPBDelta_Operation__storage_)
-                                         flags:0];
+                                         flags:GPBDescriptorInitializationFlag_None];
+    [localDescriptor setupContainingMessageClassName:GPBStringifySymbol(GDOPBDelta)];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }
@@ -569,21 +537,21 @@ typedef struct GDOPBDelta_Operation__storage_ {
 
 @end
 
-#pragma mark - GDOPBDelta_Embed
+#pragma mark - GDOPBDelta_Operation_Embed
 
-@implementation GDOPBDelta_Embed
+@implementation GDOPBDelta_Operation_Embed
 
 @dynamic image;
 @dynamic video;
 @dynamic space;
 @dynamic button;
 
-typedef struct GDOPBDelta_Embed__storage_ {
+typedef struct GDOPBDelta_Operation_Embed__storage_ {
   uint32_t _has_storage_[1];
   NSString *image;
   NSString *video;
   NSString *button;
-} GDOPBDelta_Embed__storage_;
+} GDOPBDelta_Operation_Embed__storage_;
 
 // This method is threadsafe because it is initially called
 // in +initialize for each subclass.
@@ -594,25 +562,25 @@ typedef struct GDOPBDelta_Embed__storage_ {
       {
         .name = "image",
         .dataTypeSpecific.className = NULL,
-        .number = GDOPBDelta_Embed_FieldNumber_Image,
+        .number = GDOPBDelta_Operation_Embed_FieldNumber_Image,
         .hasIndex = 0,
-        .offset = (uint32_t)offsetof(GDOPBDelta_Embed__storage_, image),
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation_Embed__storage_, image),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
         .name = "video",
         .dataTypeSpecific.className = NULL,
-        .number = GDOPBDelta_Embed_FieldNumber_Video,
+        .number = GDOPBDelta_Operation_Embed_FieldNumber_Video,
         .hasIndex = 1,
-        .offset = (uint32_t)offsetof(GDOPBDelta_Embed__storage_, video),
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation_Embed__storage_, video),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
       {
         .name = "space",
         .dataTypeSpecific.className = NULL,
-        .number = GDOPBDelta_Embed_FieldNumber_Space,
+        .number = GDOPBDelta_Operation_Embed_FieldNumber_Space,
         .hasIndex = 2,
         .offset = 3,  // Stored in _has_storage_ to save space.
         .flags = GPBFieldOptional,
@@ -621,21 +589,22 @@ typedef struct GDOPBDelta_Embed__storage_ {
       {
         .name = "button",
         .dataTypeSpecific.className = NULL,
-        .number = GDOPBDelta_Embed_FieldNumber_Button,
+        .number = GDOPBDelta_Operation_Embed_FieldNumber_Button,
         .hasIndex = 4,
-        .offset = (uint32_t)offsetof(GDOPBDelta_Embed__storage_, button),
+        .offset = (uint32_t)offsetof(GDOPBDelta_Operation_Embed__storage_, button),
         .flags = GPBFieldOptional,
         .dataType = GPBDataTypeString,
       },
     };
     GPBDescriptor *localDescriptor =
-        [GPBDescriptor allocDescriptorForClass:[GDOPBDelta_Embed class]
+        [GPBDescriptor allocDescriptorForClass:[GDOPBDelta_Operation_Embed class]
                                      rootClass:[GDOPBGoodowOperationRoot class]
                                           file:GDOPBGoodowOperationRoot_FileDescriptor()
                                         fields:fields
                                     fieldCount:(uint32_t)(sizeof(fields) / sizeof(GPBMessageFieldDescription))
-                                   storageSize:sizeof(GDOPBDelta_Embed__storage_)
-                                         flags:0];
+                                   storageSize:sizeof(GDOPBDelta_Operation_Embed__storage_)
+                                         flags:GPBDescriptorInitializationFlag_None];
+    [localDescriptor setupContainingMessageClassName:GPBStringifySymbol(GDOPBDelta_Operation)];
     NSAssert(descriptor == nil, @"Startup recursed!");
     descriptor = localDescriptor;
   }

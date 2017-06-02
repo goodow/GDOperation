@@ -1,5 +1,7 @@
 syntax = "proto3";
 option objc_class_prefix = "GDOPB";
+import "goodow_bool.proto";
+
 package goodow.protobuf;
 
 // 样式的集合
@@ -26,28 +28,22 @@ message Attribute {
   /** Embeds Formats **/
   string width = 14;
   string height = 15;
+};
 
-  enum Bool {
-    DEFAULT_BOOL = 0; // 默认值
-    true = 1;
-    false = 2;
-  };
+// 对齐方式, 作用于整行或一个段落
+enum Alignment {
+  DEFAULT_ALIGNMENT = 0; // 默认值
+  left = 1; // 故意使用小写, 以使转换为 JSON 后的值为 'left'
+  center = 2;
+  right = 3;
+  justify = 4;
+};
 
-  // 对齐方式, 作用于整行或一个段落
-  enum Alignment {
-    DEFAULT_ALIGNMENT = 0; // 默认值
-    left = 1; // 故意使用小写, 以使转换为 JSON 后的值为 'left'
-    center = 2;
-    right = 3;
-    justify = 4;
-  };
-
-  // 角标
-  enum Script {
-    DEFAULT_SCRIPT = 0; // 默认值
-    super = 1;
-    sub = 2;
-  };
+// 角标
+enum Script {
+  DEFAULT_SCRIPT = 0; // 默认值
+  super = 1;
+  sub = 2;
 };
 
 // 富文本数据模型
@@ -63,13 +59,13 @@ message Delta {
     uint64 delete = 4; // 先保留, 暂不实现
 
     Attribute attributes = 5; // 样式
-  };
 
-  // 非文本类型内容
-  message Embed {
-    string image = 1; // 图片 url
-    string video = 2; // 视频 url
-    bool space = 3; // 空白点位. 等同于 url 为一个透明图片的 image
-    string button = 4; // 按钮标题. 使用 link 属性表示点击动作
+    // 非文本类型内容
+    message Embed {
+      string image = 1; // 图片 url
+      string video = 2; // 视频 url
+      bool space = 3; // 空白点位. 等同于 url 为一个透明图片的 image
+      string button = 4; // 按钮标题. 使用 link 属性表示点击动作
+    };
   };
 };

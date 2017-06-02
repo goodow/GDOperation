@@ -33,6 +33,7 @@
 
 - (id)initWithFile:(NSString *)urlString specifier:(id)specifier {
   if (self = [super init]) {
+    self.title = @"富文本预览";
   }
   return self;
 }

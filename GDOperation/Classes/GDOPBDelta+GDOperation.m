@@ -133,7 +133,7 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
               break;
             case GPBDataTypeEnum: {
               int32_t rawValue = GPBGetMessageInt32Field(attributes, field);
-              if (NULL_ENUM_VALUE == rawValue || ([field.enumDescriptor.name isEqualToString:GDOPBAttribute_Bool_EnumDescriptor().name] && rawValue == GDOPBAttribute_Bool_False)) {
+              if (NULL_ENUM_VALUE == rawValue || ([field.enumDescriptor.name isEqualToString:GDPBBool_EnumDescriptor().name] && rawValue == GDPBBool_False)) {
                 GPBClearMessageField(attributes, field);
                 continue;
               }

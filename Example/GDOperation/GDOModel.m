@@ -4,9 +4,11 @@
 //
 
 #import "GDOModel.h"
+#import "GoodowBool.pbobjc.h"
 #import "GoodowOperation.pbobjc.h"
 #import "GDOPBDelta+GDOperation.h"
 #import "GPBMessage+JsonFormat.h"
+
 @implementation GDOModel {
 
 }
@@ -16,7 +18,7 @@
     _dataSource = @[].mutableCopy;
     GDOPBDelta *delta = [GDOPBDelta message];
     GDOPBAttribute *attribute = [GDOPBAttribute message]
-        .setBold(GDOPBAttribute_Bool_True).setItalic(GDOPBAttribute_Bool_False);
+        .setBold(GDPBBool_True).setItalic(GDPBBool_False);
 //        .setSize(@"22px");
     delta.insert(@"Label", attribute);
     _dataSource[0] = delta;
