@@ -28,7 +28,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
   self = [super init];
   if (self) {
     self.ref = ref;
-    self.document = GDOPBDelta.message;
+    self.document = GDOPBDelta.message.insert(@"\n", nil);
     self.pendingReceivedRevisions = @{}.mutableCopy;
 
     [self monitorHistory];
@@ -103,7 +103,8 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
   }
 
   if (self.onTextChange) {
-    self.onTextChange(self.document, self.document);
+    GDOPBDelta *initDelta = self.document.compose(GDOPBDelta.message.retain_p(self.document.length -1, nil).delete(1));
+    self.onTextChange(initDelta, self.document);
   }
   self.ready = YES;
 }
@@ -160,7 +161,7 @@ static const NSString *CHARACTERS = @"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdef
   return toRtn;
 }
 
-+ (NSString *)revisionToId:(unsigned long long int)revision {
++ (NSString *)revisionToId:(unsigned long long)revision {
   if (revision == 0) {
     return @"A0";
   }

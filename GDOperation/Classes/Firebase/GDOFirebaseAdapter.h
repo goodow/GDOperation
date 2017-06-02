@@ -13,4 +13,7 @@
 
 - (instancetype)initWithRef:(FIRDatabaseReference *)ref;
 
++ (NSString *)revisionToId:(unsigned long long)revision;
+
++ (unsigned long long)revisionFromId:(NSString *)revisionId;
 @end

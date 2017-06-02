@@ -84,15 +84,15 @@
 
 // 插入文本
 - (GDOPBDelta *(^)(unsigned long long index, NSString *text, GDOPBAttribute *attributes))insertText {
-  return ^GDOPBDelta *(unsigned long long int index, NSString *text, GDOPBAttribute *attributes) {
+  return ^GDOPBDelta *(unsigned long long index, NSString *text, GDOPBAttribute *attributes) {
       return [GDOPBDelta message].retain_p(index, nil).insert(text, attributes);
   };
 }
 
 // 获取AttributedString长度
 - (unsigned long long (^)())getLength {
-  return ^unsigned long long int {
-      return self.editor.delta.length ?: 1;
+  return ^unsigned long long {
+      return self.editor.delta.length;
   };
 }
 

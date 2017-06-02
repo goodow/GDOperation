@@ -185,7 +185,7 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
 }
 
 - (GDOPBDelta *(^)(unsigned long long, GDOPBAttribute *))retain_p {
-  return ^GDOPBDelta *(unsigned long long int length, GDOPBAttribute *attributes) {
+  return ^GDOPBDelta *(unsigned long long length, GDOPBAttribute *attributes) {
       if (length <= 0) {
         return self;
       }
@@ -197,7 +197,7 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
 }
 
 - (GDOPBDelta *(^)(unsigned long long))delete {
-  return ^GDOPBDelta *(unsigned long long int length) {
+  return ^GDOPBDelta *(unsigned long long length) {
       if (length <= 0) {
         return self;
       }
