@@ -1,1 +1,1 @@
-../../../../../GDOperation/Generated/GoodowOperation.pbobjc.h
+../../../../../GDOperation/Generated/goodow/operation/GoodowOperation.pbobjc.h

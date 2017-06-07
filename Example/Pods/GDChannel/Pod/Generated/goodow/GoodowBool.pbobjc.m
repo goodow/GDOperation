@@ -34,13 +34,13 @@ GPBEnumDescriptor *GDPBBool_EnumDescriptor(void) {
   static GPBEnumDescriptor *descriptor = NULL;
   if (!descriptor) {
     static const char *valueNames =
-        "DefaultBool\000True\000False\000";
+        "Default\000True\000False\000";
     static const int32_t values[] = {
-        GDPBBool_DefaultBool,
+        GDPBBool_Default,
         GDPBBool_True,
         GDPBBool_False,
     };
-    static const char *extraTextFormatInfo = "\002\001$\000\002%\000";
+    static const char *extraTextFormatInfo = "\003\000\'\000\001$\000\002%\000";
     GPBEnumDescriptor *worker =
         [GPBEnumDescriptor allocDescriptorForName:GPBNSStringifySymbol(GDPBBool)
                                        valueNames:valueNames
@@ -57,7 +57,7 @@ GPBEnumDescriptor *GDPBBool_EnumDescriptor(void) {
 
 BOOL GDPBBool_IsValidValue(int32_t value__) {
   switch (value__) {
-    case GDPBBool_DefaultBool:
+    case GDPBBool_Default:
     case GDPBBool_True:
     case GDPBBool_False:
       return YES;

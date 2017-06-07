@@ -31,22 +31,22 @@ TODO: Add long description of the pod here.
   s.ios.deployment_target = '8.0'
 
   s.subspec 'Core' do |sp|
-    s.dependency 'Protobuf', '~> 3.0'
-    s.dependency 'GDChannel'
+    sp.dependency 'Protobuf', '~> 3.0'
+    sp.dependency 'GDChannel'
 
     sp.requires_arc = ['GDOperation/Classes/**/*']
     sp.source_files = 'GDOperation/Classes/*', 'GDOperation/Classes/AttributedString/**/*', 'GDOperation/Generated/**/*'
-  end
-
-  s.subspec 'Firebase' do |sp|
-    sp.dependency 'GDOperation/YYText'
-    s.dependency 'Firebase/Database'
-    sp.source_files = 'GDOperation/Classes/Firebase/**/*'
   end
 
   s.subspec 'YYText' do |sp|
     sp.dependency 'GDOperation/Core'
     sp.dependency 'YYText', '~> 1.0'
     sp.source_files = 'GDOperation/Classes/YYText/**/*'
+  end
+
+  s.subspec 'Firebase' do |sp|
+    sp.dependency 'GDOperation/YYText'
+    sp.dependency 'Firebase/Database'
+    sp.source_files = 'GDOperation/Classes/Firebase/**/*'
   end
 end

@@ -18,20 +18,17 @@
   "platforms": {
     "ios": "8.0"
   },
-  "dependencies": {
-    "Protobuf": [
-      "~> 3.0"
-    ],
-    "GDChannel": [
-
-    ],
-    "Firebase/Database": [
-
-    ]
-  },
   "subspecs": [
     {
       "name": "Core",
+      "dependencies": {
+        "Protobuf": [
+          "~> 3.0"
+        ],
+        "GDChannel": [
+
+        ]
+      },
       "requires_arc": [
         "GDOperation/Classes/**/*"
       ],
@@ -40,15 +37,6 @@
         "GDOperation/Classes/AttributedString/**/*",
         "GDOperation/Generated/**/*"
       ]
-    },
-    {
-      "name": "Firebase",
-      "dependencies": {
-        "GDOperation/YYText": [
-
-        ]
-      },
-      "source_files": "GDOperation/Classes/Firebase/**/*"
     },
     {
       "name": "YYText",
@@ -61,6 +49,18 @@
         ]
       },
       "source_files": "GDOperation/Classes/YYText/**/*"
+    },
+    {
+      "name": "Firebase",
+      "dependencies": {
+        "GDOperation/YYText": [
+
+        ],
+        "Firebase/Database": [
+
+        ]
+      },
+      "source_files": "GDOperation/Classes/Firebase/**/*"
     }
   ]
 }

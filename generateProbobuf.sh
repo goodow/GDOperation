@@ -1,1 +1,1 @@
-protoc --objc_out=GDOperation/Generated -IGDOperation/protos GDOperation/protos/goodow_operation.proto GDOperation/protos/goodow_bool.proto
+protoc --objc_out=GDOperation/Generated/goodow/operation -Iprotos -IExample/Pods/GDChannel/protos protos/goodow_operation.proto

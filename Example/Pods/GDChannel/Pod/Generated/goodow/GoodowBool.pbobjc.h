@@ -39,7 +39,7 @@ typedef GPB_ENUM(GDPBBool) {
    **/
   GDPBBool_GPBUnrecognizedEnumeratorValue = kGPBUnrecognizedEnumeratorValue,
   /** 默认值 */
-  GDPBBool_DefaultBool = 0,
+  GDPBBool_Default = 0,
   GDPBBool_True = 1,
   GDPBBool_False = 2,
 };
