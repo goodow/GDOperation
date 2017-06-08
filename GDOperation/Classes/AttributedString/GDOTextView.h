@@ -9,4 +9,5 @@
 
 + (GDORichText *(^)(UITextView *textView))attachView;
 
++ (void)publishLinkClick:(NSURL *)url;
 @end

@@ -64,11 +64,11 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
     }
     if (nextOp.retain_p) {
       retOp.retain_p = length;
-    } else if (nextOp.insert.length) {
-      retOp.insert = [nextOp.insert substringWithRange:NSMakeRange(offset, length)];
-    } else {
+    } else if (nextOp.hasInsertEmbed) {
       // offset should == 0, length should == 1
       retOp.insertEmbed = nextOp.insertEmbed;
+    } else {
+      retOp.insert = [nextOp.insert substringWithRange:NSMakeRange(offset, length)];
     }
     return retOp;
   }
@@ -107,7 +107,7 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
   } else if (op.retain_p) {
     return op.retain_p;
   } else {
-    return op.insert.length ?: 1;
+    return op.hasInsertEmbed ? 1 : op.insert.length;
   }
 }
 
@@ -225,6 +225,8 @@ const NSString *NULL_SENTINEL_CHARACTER = @"\uE000";
             GDOPBDelta_Operation *newOp = GDOPBDelta_Operation.message;
             if (thisOp.retain_p) {
               newOp.retain_p = length;
+            } else if (thisOp.hasInsertEmbed) {
+              newOp.insertEmbed = thisOp.insertEmbed;
             } else {
               newOp.insert = thisOp.insert;
             }

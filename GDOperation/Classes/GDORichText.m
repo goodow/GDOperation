@@ -5,24 +5,12 @@
 #import "GDORichText.h"
 #import "NSObject+GDChannel.h"
 #import "GDOEditor.h"
-#import "GDOLabel.h"
-#import "GDOTextView.h"
 
 @interface GDORichText ()
 @property (nonatomic, strong) id<GDOEditor> editor;
 @end
 
 @implementation GDORichText {
-}
-
-- (instancetype)initWithLabel:(UILabel *)label {
-  self = GDOLabel.attachView(label);
-  return self;
-}
-
-- (instancetype)initWithTextView:(UITextView *)textView {
-  self = GDOTextView.attachView(textView);
-  return self;
 }
 
 - (instancetype)initWithEditor:(id<GDOEditor>)editor {

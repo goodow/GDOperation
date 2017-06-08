@@ -9,6 +9,8 @@
 #import "GDOAttributedStringUtil.h"
 #import "GDORichText.h"
 
+static const char kGDOLabelKey = 0;
+
 @interface GDOLabel ()
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
 @property(nonatomic, weak) UILabel *label;
@@ -30,6 +32,7 @@
     _label = label;
     _attributedText = [[NSMutableAttributedString alloc] init];
     _delta = GDOPBDelta.message.insert(@"\n", nil);
+    objc_setAssociatedObject(_label, &kGDOLabelKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   }
 
   return self;
@@ -65,8 +68,13 @@
       NSString *text = op.insert;
       NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
       string = [[NSAttributedString alloc] initWithString:text attributes:attr];
-    } else if (op.insertEmbed.image) {
-      string = [self.class createImageEmbed:op];
+    } else if (op.insertEmbed.image.length) {
+      __weak typeof(self) weakSelf = self;
+      string = [self.class createImageEmbed:op downloadCompletionHandler:^{
+          dispatch_async(dispatch_get_main_queue(), ^{
+              [weakSelf update];
+          });
+      }];
     } else if (op.insertEmbed.space) {
       string = [self.class createSpaceEmbed:op];
     }
@@ -90,7 +98,7 @@
   }
 }
 
-+ (NSAttributedString *)createImageEmbed:(GDOPBDelta_Operation *)op {
++ (NSAttributedString *)createImageEmbed:(GDOPBDelta_Operation *)op downloadCompletionHandler:(void (^)())completionHandler {
   NSString *imageString = op.insertEmbed.image;
   NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
   UIImage *image = [UIImage imageNamed:imageString];
@@ -98,15 +106,14 @@
     textAttachment.image = image;
   } else {
     NSURL *url = [NSURL URLWithString:imageString];
-    __weak typeof(self) weakSelf = self;
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
           return;
         }
-        dispatch_async(dispatch_get_main_queue(), ^{
-            textAttachment.image = [UIImage imageWithData:data];
-            [weakSelf update];
-        });
+        textAttachment.image = [UIImage imageWithData:data];
+        if (completionHandler) {
+          completionHandler();
+        }
     }];
     [task resume];
   }
@@ -115,7 +122,13 @@
   if (width && height) {
     textAttachment.bounds = CGRectMake(0, 0, width, height);
   }
-  return [NSAttributedString attributedStringWithAttachment:textAttachment];
+  NSAttributedString *string = [NSAttributedString attributedStringWithAttachment:textAttachment];
+  if (op.attributes.link.length) {
+    NSMutableAttributedString *mutableCopy = string.mutableCopy;
+    [mutableCopy addAttribute:Link_Attribute value:op.attributes.link range:NSMakeRange(0, 1)];
+    return mutableCopy;
+  }
+  return string;
 }
 
 + (NSAttributedString *)createSpaceEmbed:(GDOPBDelta_Operation *)op {

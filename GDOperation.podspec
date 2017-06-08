@@ -36,6 +36,8 @@ TODO: Add long description of the pod here.
 
     sp.requires_arc = ['GDOperation/Classes/**/*']
     sp.source_files = 'GDOperation/Classes/*', 'GDOperation/Classes/AttributedString/**/*', 'GDOperation/Generated/**/*'
+
+    sp.resource_bundle = { 'GDOperation' => 'protos/*.proto' }
   end
 
   s.subspec 'YYText' do |sp|

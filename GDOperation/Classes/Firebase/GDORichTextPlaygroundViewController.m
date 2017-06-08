@@ -101,8 +101,8 @@
       CGSize size = [self.textView sizeThatFits:CGSizeMake(cell.bounds.size.width, MAXFLOAT)];
       self.heightConstraint.constant = size.height;
       //      [cell layoutIfNeeded];
-    }
       break;
+    }
     case 2:
       cell.textLabel.text = @"YYTextView 预览:";
       break;
@@ -122,8 +122,8 @@
       CGSize size = [self.yyTextView sizeThatFits:CGSizeMake(cell.bounds.size.width, MAXFLOAT)];
       self.yyHeightConstraint.constant = size.height;
       //      [cell layoutIfNeeded];
-    }
       break;
+    }
     case 4:
       cell.textLabel.text = @"UILabel 预览:";
       break;

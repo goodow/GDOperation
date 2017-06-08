@@ -11,7 +11,7 @@
 #import "GDORichText.h"
 #import "GDOLabel.h"
 
-static const char kRichTextKey = 0;
+static const char kGDOTextViewKey = 0;
 
 @interface GDOTextView () <UITextViewDelegate>
 @property(nonatomic, weak) UITextView *textView;
@@ -35,9 +35,9 @@ static const char kRichTextKey = 0;
   if (self) {
     _textView = textView;
     _textView.delegate = self;
-    objc_setAssociatedObject(_textView, &kRichTextKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     _attributedText = [[NSMutableAttributedString alloc] initWithString:@"\n"];
     _delta = GDOPBDelta.message.insert(@"\n", nil);
+    objc_setAssociatedObject(_textView, &kGDOTextViewKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   }
   return self;
 }
@@ -88,7 +88,12 @@ static const char kRichTextKey = 0;
     if (op.hasInsertEmbed) {
       NSAttributedString *string = nil;
       if (op.insertEmbed.image.length) {
-        string = [self insertImageEmbed:cursor op:op];
+        __weak typeof(self) weakSelf = self;
+        string = [GDOLabel createImageEmbed:op downloadCompletionHandler:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf update];
+            });
+        }];
       } else if (op.insertEmbed.space) {
         string = [GDOLabel createSpaceEmbed:op];
       }
@@ -150,60 +155,29 @@ static const char kRichTextKey = 0;
   }
 }
 
-- (NSAttributedString *)insertImageEmbed:(long)cursor op:(GDOPBDelta_Operation *)op {
-  NSString *imageName = [op.insertEmbed.image length] ? op.insertEmbed.image : op.insertEmbed.button;
-  NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-  UIImage *image = [UIImage imageNamed:imageName];
-  if (image) {
-    textAttachment.image = image;
-  } else {
-    NSURL *url = [NSURL URLWithString:imageName];
-    __weak typeof(self) weakSelf = self;
-    NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (!error) {
-          dispatch_async(dispatch_get_main_queue(), ^{
-              textAttachment.image = [UIImage imageWithData:data];
-              [weakSelf update];
-          });
-        } else {
-          dispatch_async(dispatch_get_main_queue(), ^{
-              textAttachment.image = [UIImage new];
-              [weakSelf update];
-          });
-        }
-    }];
-    [task resume];
-  }
-  if ([GDOAttributedStringUtil sizeFromString:op.attributes.width] && [GDOAttributedStringUtil sizeFromString:op.attributes.height]) {
-    textAttachment.bounds = CGRectMake(0, 0, [GDOAttributedStringUtil sizeFromString:op.attributes.width], [GDOAttributedStringUtil sizeFromString:op.attributes.height]);
-  }
-
-  if ([op.attributes.link length]) {
-    [self.attributedText addAttribute:@"userlink" value:op.attributes.link range:NSMakeRange(cursor, 1)];
-  }
-  return [NSAttributedString attributedStringWithAttachment:textAttachment];
-}
-
 - (void)update {
   self.textView.attributedText = nil; // force to update
   self.textView.attributedText = self.attributedText;
 }
 
 
++ (void)publishLinkClick:(NSString *)url {
+  NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
+  [self.bus publishLocal:topic payload:url];
+}
+
 #pragma mark - UITextViewDelegate
 
 // textView回调，用于跳转富文本中的超链接
 - (BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)url inRange:(NSRange)characterRange {
-  NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
-  [self.bus publishLocal:topic payload:url.absoluteString];
+  [self.class publishLinkClick:url.absoluteString];
   return NO;
 }
 
 - (BOOL)textView:(UITextView *)textView shouldInteractWithTextAttachment:(NSTextAttachment *)textAttachment inRange:(NSRange)characterRange {
-  NSString *attachLink = [self.attributedText attribute:@"userlink" atIndex:characterRange.location longestEffectiveRange:nil inRange:characterRange];
-  if ([attachLink length]) {
-    NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
-    [self.bus publishLocal:topic payload:attachLink];
+  NSString *attachLink = [self.attributedText attribute:Link_Attribute atIndex:characterRange.location longestEffectiveRange:nil inRange:characterRange];
+  if (attachLink.length) {
+    [self.class publishLinkClick:attachLink];
   }
   return NO;
 }
