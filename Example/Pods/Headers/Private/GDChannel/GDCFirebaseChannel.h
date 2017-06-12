@@ -1,0 +1,1 @@
+../../../GDChannel/Pod/Classes/Firebase/GDCFirebaseChannel.h

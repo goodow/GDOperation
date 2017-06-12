@@ -7,15 +7,24 @@
 //
 
 #import "GDOAppDelegate.h"
+#import "GDCFirebaseChannel.h"
+#import "GDCBusProvider.h"
 @import Firebase;
+
+@interface GDOAppDelegate ()
+@property(nonatomic, strong) GDCFirebaseChannel *bus;
+@end
 
 @implementation GDOAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     // Override point for customization after application launch.
-    [FIRApp configure];
-    return YES;
+  [FIRApp configure];
+  NSString *string = GDCBusProvider.clientId;
+  NSLog(@"clientId: %@", string);
+  self.bus = [[GDCFirebaseChannel alloc] init];
+  return YES;
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application

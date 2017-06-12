@@ -12,6 +12,7 @@
 #import "GDCBusProvider.h"
 #import "GPBMessage+JsonFormat.h"
 #import "GDORichText.h"
+#import "GDOLabel.h"
 
 @interface GDOTableViewCell ()
 @property(weak, nonatomic) IBOutlet UILabel *richText;
@@ -27,7 +28,7 @@
 }
 
 - (void)applyPatch:(GDOPBDelta *)delta {
-  [[GDORichText alloc] initWithLabel:self.richText].updateContents(delta);
+  GDOLabel.attachView(self.richText).updateContents(delta);
 }
 
 - (void)subscribe {

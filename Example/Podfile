@@ -1,8 +1,6 @@
 # use_frameworks!
 
 target 'GDOperation_Example' do
-  pod 'GDChannel', :git => 'https://github.com/goodow/GDChannel.git'
+  pod 'GDChannel/Firebase', :git => 'https://github.com/goodow/GDChannel.git'
   pod 'GDOperation', :path => '../'
-
-  pod 'Firebase/Database'
 end

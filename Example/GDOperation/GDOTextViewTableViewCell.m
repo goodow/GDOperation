@@ -8,6 +8,7 @@
 
 #import "GDOTextViewTableViewCell.h"
 #import "GDORichText.h"
+#import "GDOTextView.h"
 
 @interface GDOTextViewTableViewCell ()
 @property (weak, nonatomic) IBOutlet UITextView *textView;
@@ -24,7 +25,7 @@
 }
 
 - (void)applyPatch:(GDOPBDelta *)delta {
-  [[GDORichText alloc] initWithTextView:_textView].updateContents(delta);
+  GDOTextView.attachView(self.textView).updateContents(delta);
 }
 
 @end

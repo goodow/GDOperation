@@ -14,22 +14,41 @@
   "platforms": {
     "ios": "7.0"
   },
-  "source_files": [
-    "Pod/Classes/**/*",
-    "Pod/Generated/**/*"
-  ],
-  "requires_arc": [
-    "Pod/Classes/**/*"
-  ],
-  "resource_bundles": {
-    "GDChannel": "protos/*.proto"
-  },
-  "dependencies": {
-    "MQTTKit": [
-      "~> 0.1.0"
-    ],
-    "Protobuf": [
-      "~> 3.0"
-    ]
-  }
+  "default_subspecs": "Core",
+  "subspecs": [
+    {
+      "name": "Core",
+      "dependencies": {
+        "MQTTKit": [
+          "~> 0.1.0"
+        ],
+        "Protobuf": [
+          "~> 3.0"
+        ]
+      },
+      "source_files": [
+        "Pod/Classes/**/*",
+        "Pod/Generated/**/*"
+      ],
+      "requires_arc": [
+        "Pod/Classes/**/*"
+      ],
+      "exclude_files": "Pod/Classes/Firebase/**/*",
+      "resource_bundles": {
+        "GDChannel": "protos/*.proto"
+      }
+    },
+    {
+      "name": "Firebase",
+      "dependencies": {
+        "Firebase/Database": [
+
+        ],
+        "GDChannel/Core": [
+
+        ]
+      },
+      "source_files": "Pod/Classes/Firebase/**/*"
+    }
+  ]
 }

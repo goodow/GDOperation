@@ -36,7 +36,10 @@
         "GDOperation/Classes/*",
         "GDOperation/Classes/AttributedString/**/*",
         "GDOperation/Generated/**/*"
-      ]
+      ],
+      "resource_bundles": {
+        "GDOperation": "protos/*.proto"
+      }
     },
     {
       "name": "YYText",

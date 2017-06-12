@@ -10,6 +10,7 @@
 #import "GDORichText.h"
 #import "GPBMessage+JsonFormat.h"
 #import "GDOFirebaseAdapter.h"
+#import "GDOTextView.h"
 @import Firebase;
 
 @interface GDOViewController ()
@@ -25,7 +26,7 @@
   // Do any additional setup after loading the view, typically from a nib.
   UITextView *textView = [[UITextView alloc] initWithFrame:CGRectMake(0, 0, UIScreen.mainScreen.bounds.size.width, UIScreen.mainScreen.bounds.size.height)];
   [self.view addSubview:textView];
-  self.richText = [[GDORichText alloc] initWithTextView:textView];
+  self.richText = GDOTextView.attachView(textView);
   textView.editable = NO;
 
   self.ref = [[FIRDatabase database] reference];
