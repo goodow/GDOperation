@@ -10,16 +10,16 @@
 #import "GDOAttributedStringUtil.h"
 #import "GDORichText.h"
 
-#import "YYTextView.h"
 #import "NSAttributedString+YYText.h"
+#import "GDOLabel.h"
+#import "GDOTextView.h"
 
-static const char kAttachmentKey = 0;
 static const char kRichTextKey = 0;
 
 @interface GDOYYTextView () <YYTextViewDelegate>
 @property(nonatomic, weak) YYTextView *textView;
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
-@property (nonatomic, strong) GDOPBDelta *delta;
+@property(nonatomic, strong) GDOPBDelta *delta;
 
 @end
 
@@ -29,7 +29,7 @@ static const char kRichTextKey = 0;
 
 + (GDORichText *(^)(YYTextView *textView))attachView {
   return ^GDORichText *(YYTextView *textView) {
-    return [[GDORichText alloc] initWithEditor:[[GDOYYTextView alloc] initWithTextView:textView]];
+      return [[GDORichText alloc] initWithEditor:[[GDOYYTextView alloc] initWithTextView:textView]];
   };
 }
 
@@ -38,86 +38,48 @@ static const char kRichTextKey = 0;
   if (self) {
     _textView = textView;
     _textView.delegate = self;
-    objc_setAssociatedObject(_textView, &kRichTextKey,self , OBJC_ASSOCIATION_RETAIN_NONATOMIC);//让view持有self,避免被释放掉
     _attributedText = [[NSMutableAttributedString alloc] initWithString:@"\n"];
     _delta = GDOPBDelta.message.insert(@"\n", nil);
+    objc_setAssociatedObject(_textView, &kRichTextKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   }
   return self;
 }
--(void)dealloc{
-  NSLog(@"dellocate");
-}
+
 - (GDOPBDelta *(^)(GDOPBDelta *delta))applyDelta {
   return ^GDOPBDelta *(GDOPBDelta *delta) {
-    [self apply:delta];
-    [self update];
-    self.delta = self.delta.compose(delta);
-    return nil;
+      [self apply:delta];
+      [self update];
+      self.delta = self.delta.compose(delta);
+      return delta;
   };
 }
--(void)setImage:(UIImage*)image withView:(UIView*)view{
-  if ([view isKindOfClass:[UIImageView class]]) {
-    [(UIImageView*)view setImage:image];
-  } else {
-    [(UIButton*)view setBackgroundImage:image forState:UIControlStateNormal];
-  }
-}
+
 #pragma mark - Internal methods
 
-// 根据delta更新attributedText
 - (void)apply:(GDOPBDelta *)delta {
   long cursor = 0;
   for (GDOPBDelta_Operation *op in delta.opsArray) { // 遍历富文本片段
     if (op.insert.length) { // 有文本信息
       NSString *text = op.insert;
+      NSAttributedString *string = nil;
       if (![text isEqualToString:@"\n"]) { // 不是换行段落
-        NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
-        NSAttributedString *str = [[NSAttributedString alloc] initWithString:text attributes:attr];
-        [self.attributedText insertAttributedString:str atIndex:cursor];
+        string = [GDOTextView parseInsertText:op];
         if (op.attributes.link.length) {
-          self.textView.linkTextAttributes = attr;
+          self.textView.linkTextAttributes = [string attributesAtIndex:0 effectiveRange:NULL];
         }
       } else { // 换行段落
-        NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
-        long lineStart = 0;
-        if (range.location != NSNotFound) {
-          lineStart = range.location + 1;
-        }
-        [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:@"\n"] atIndex:cursor];
-        NSMutableParagraphStyle *paragraphStyle = nil;
-        if (cursor && ((lineStart) < self.attributedText.length)) {
-          paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
-        }
-        paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
-        if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
-          [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor + 1 - lineStart)];
-        }
+        string = [GDOTextView.class parseInsertNewParagraph:self.attributedText at:cursor op:op];
       }
+      [self.attributedText insertAttributedString:string atIndex:cursor];
       cursor += text.length;
       continue;
     }
 
     if (op.retain_p > 0) {
       if ([self.attributedText.string characterAtIndex:cursor] != '\n') {
-        NSArray *toRemove;
-        NSDictionary<NSString *, id> *attrs = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:&toRemove];
-        if (attrs.count) {
-          [self.attributedText addAttributes:attrs range:NSMakeRange(cursor, op.retain_p)];
-        }
-        for (NSString *key in toRemove) {
-          [self.attributedText removeAttribute:key range:NSMakeRange(cursor, op.retain_p)];
-        }
+        [GDOTextView.class retainText:self.attributedText at:cursor op:op];
       } else {
-        NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor == 0 ? 0 : cursor - 1)];
-        long lineStart = 0;
-        if (range.location != NSNotFound) {
-          lineStart = range.location + 1;
-        }
-        NSMutableParagraphStyle *paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
-        paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
-        if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
-          [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
-        }
+        [GDOTextView.class retainParagraph:self.attributedText at:cursor op:op];
       }
       cursor += op.retain_p;
       continue;
@@ -129,75 +91,71 @@ static const char kRichTextKey = 0;
     }
 
     if (op.hasInsertEmbed) {
-      if (op.insertEmbed.space) {
-        if (([GDOAttributedStringUtil sizeFromString:op.attributes.width] > 0) || ([GDOAttributedStringUtil sizeFromString:op.attributes.height] > 0)) {
-          NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-          textAttachment.image = [UIImage new];
-          CGFloat width = [GDOAttributedStringUtil sizeFromString:op.attributes.width] ?: 0.1;
-          CGFloat height = [GDOAttributedStringUtil sizeFromString:op.attributes.height] ?: 0.1;
-          textAttachment.bounds = CGRectMake(0, 0, width, height);
-          if ([op.attributes.link length]) {
-            objc_setAssociatedObject(textAttachment, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-          }
-          NSAttributedString *attr9 = [NSAttributedString attributedStringWithAttachment:textAttachment];
-          [self.attributedText insertAttributedString:attr9 atIndex:cursor];
-          cursor += 1;
-        }
-      } else if (op.insertEmbed.image || op.insertEmbed.button) {
+      NSAttributedString *string = nil;
+      if (op.insertEmbed.image.length) {
+        __weak typeof(self) weakSelf = self;
+        string = [GDOLabel createImageEmbed:op downloadCompletionHandler:^{
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [weakSelf update];
+            });
+        }];
+      } else if (op.insertEmbed.space) {
+        string = [GDOLabel createSpaceEmbed:op];
+      } else if (op.insertEmbed.button.length) {
         NSString *imageName;
-        UIView *view ;
-        if ([op.insertEmbed.image length]) {
-          imageName = op.insertEmbed.image;
-          view = [UIImageView new];
-          view.userInteractionEnabled = YES;
-          UITapGestureRecognizer *tap =[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(imageTaped:)];
-          [view addGestureRecognizer:tap];
-        } else {
-          imageName = op.insertEmbed.button;
-          view = [UIButton new];
-          [(UIButton*)view addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
-        }
-        if ([GDOAttributedStringUtil sizeFromString:op.attributes.width]&& [GDOAttributedStringUtil sizeFromString:op.attributes.height]) {
-          view.bounds = CGRectMake(0, 0,[GDOAttributedStringUtil sizeFromString:op.attributes.width] , [GDOAttributedStringUtil sizeFromString:op.attributes.height]);
+        UIButton *button = [UIButton new];
+        imageName = op.insertEmbed.button;
+        [button addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
+        if ([GDOAttributedStringUtil sizeFromString:op.attributes.width] && [GDOAttributedStringUtil sizeFromString:op.attributes.height]) {
+          button.bounds = CGRectMake(0, 0, [GDOAttributedStringUtil sizeFromString:op.attributes.width], [GDOAttributedStringUtil sizeFromString:op.attributes.height]);
         }
         YYTextAttachment *attach = [[YYTextAttachment alloc] init];
-        attach.content = view;
+        attach.content = button;
         if ([op.attributes.link length]) {
-          objc_setAssociatedObject(view, &kAttachmentKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+          objc_setAssociatedObject(button, &kRichTextKey, op.attributes.link, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
         }
         attach.contentMode = UIViewContentModeCenter;
 
 
-        NSMutableAttributedString *attr9 = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
-        [attr9 yy_setTextAttachment:attach range:NSMakeRange(0, attr9.length)];
+        NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:YYTextAttachmentToken];
+        [attrStr yy_setTextAttachment:attach range:NSMakeRange(0, attrStr.length)];
+        string = attrStr;
         UIImage *image = [UIImage imageNamed:imageName];
         if (image) {
-          [self setImage:image withView:view];
+          [self setImage:image withView:button];
         } else {
           NSURL *url = [NSURL URLWithString:imageName];
           __weak typeof(self) weakSelf = self;
-          __weak typeof(view) weakView = view;
+          __weak typeof(button) weakView = button;
           NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-            if (!error) {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                [weakSelf setImage:[UIImage imageWithData:data] withView:weakView];
-                [weakSelf update];
-              });
-            } else {
-              dispatch_async(dispatch_get_main_queue(), ^{
-                //view.image = [UIImage new];
-                [weakSelf update];
-              });
-            }
+              if (!error) {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [weakSelf setImage:[UIImage imageWithData:data] withView:weakView];
+                    [weakSelf update];
+                });
+              } else {
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    //view.image = [UIImage new];
+                    [weakSelf update];
+                });
+              }
           }];
           [task resume];
         }
-
-        [self.attributedText insertAttributedString:attr9 atIndex:cursor];
-        cursor += 1;
       }
-      continue;
+      if (string) {
+        [self.attributedText insertAttributedString:string atIndex:cursor];
+      }
+      cursor += 1;
     }
+  }
+}
+
+- (void)setImage:(UIImage *)image withView:(UIView *)view {
+  if ([view isKindOfClass:[UIImageView class]]) {
+    [(UIImageView *) view setImage:image];
+  } else {
+    [(UIButton *) view setBackgroundImage:image forState:UIControlStateNormal];
   }
 }
 
@@ -206,19 +164,11 @@ static const char kRichTextKey = 0;
   self.textView.attributedText = self.attributedText;
 }
 
-
 #pragma mark - YYTextViewDelegate
 
-// textView回调，用于跳转富文本中的超链接
-- (BOOL)textView:(YYTextView *)textView shouldInteractWithURL:(NSURL *)url inRange:(NSRange)characterRange {
-  NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
-  [self.bus publishLocal:topic payload:url.absoluteString];
-  return NO;
-}
-
 //按钮回调
--(void)buttonClicked:(UIButton*)btn{
-  NSString *attachLink = objc_getAssociatedObject(btn, &kAttachmentKey);
+- (void)buttonClicked:(UIButton *)btn {
+  NSString *attachLink = objc_getAssociatedObject(btn, &kRichTextKey);
   if ([attachLink length]) {
     NSString *clientId = [GDCBusProvider clientId];
     NSString *topic = [NSString stringWithFormat:@"%@/actions/views", clientId];
@@ -226,20 +176,10 @@ static const char kRichTextKey = 0;
   }
 }
 
-//iamge回调
--(void)imageTaped:(UITapGestureRecognizer*)tap{
-  NSString *attachLink = objc_getAssociatedObject([tap view], &kAttachmentKey);
-  if ([attachLink length]) {
-    NSString *clientId = [GDCBusProvider clientId];
-    NSString *topic = [NSString stringWithFormat:@"%@/actions/views", clientId];
-    [self.bus publishLocal:topic payload:attachLink];
-  }
-}
-
-- (void)textViewDidChangeSelection:(YYTextView *)textView {
-  // 该方法禁止textView被select时的高亮（因为[textView:shouldInteractWithURL:inRange:]方法必须在textView是selectable时生效）
-  if (!NSEqualRanges(textView.selectedRange, NSMakeRange(0, 0))) {
-    textView.selectedRange = NSMakeRange(0, 0);
-  }
-}
+//- (void)textViewDidChangeSelection:(YYTextView *)textView {
+//  // 该方法禁止textView被select时的高亮（因为[textView:shouldInteractWithURL:inRange:]方法必须在textView是selectable时生效）
+//  if (!NSEqualRanges(textView.selectedRange, NSMakeRange(0, 0))) {
+//    textView.selectedRange = NSMakeRange(0, 0);
+//  }
+//}
 @end

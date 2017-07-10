@@ -9,7 +9,7 @@
 #import "GDOAttributedStringUtil.h"
 #import "GDORichText.h"
 
-static const char kGDOLabelKey = 0;
+static const char kRichTextKey = 0;
 
 @interface GDOLabel ()
 @property(nonatomic, readonly) NSMutableAttributedString *attributedText;
@@ -32,7 +32,7 @@ static const char kGDOLabelKey = 0;
     _label = label;
     _attributedText = [[NSMutableAttributedString alloc] init];
     _delta = GDOPBDelta.message.insert(@"\n", nil);
-    objc_setAssociatedObject(_label, &kGDOLabelKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(_label, &kRichTextKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   }
 
   return self;

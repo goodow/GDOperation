@@ -11,7 +11,7 @@
 #import "GDORichText.h"
 #import "GDOLabel.h"
 
-static const char kGDOTextViewKey = 0;
+static const char kRichTextKey = 0;
 
 @interface GDOTextView () <UITextViewDelegate>
 @property(nonatomic, weak) UITextView *textView;
@@ -37,7 +37,7 @@ static const char kGDOTextViewKey = 0;
     _textView.delegate = self;
     _attributedText = [[NSMutableAttributedString alloc] initWithString:@"\n"];
     _delta = GDOPBDelta.message.insert(@"\n", nil);
-    objc_setAssociatedObject(_textView, &kGDOTextViewKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+    objc_setAssociatedObject(_textView, &kRichTextKey, self, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
   }
   return self;
 }
@@ -53,7 +53,6 @@ static const char kGDOTextViewKey = 0;
 
 #pragma mark - Internal methods
 
-// 根据delta更新attributedText
 - (void)apply:(GDOPBDelta *)delta {
   long cursor = 0;
   for (GDOPBDelta_Operation *op in delta.opsArray) { // 遍历富文本片段
@@ -61,9 +60,12 @@ static const char kGDOTextViewKey = 0;
       NSString *text = op.insert;
       NSAttributedString *string = nil;
       if (![text isEqualToString:@"\n"]) { // 不是换行段落
-        string = [self insertText:op];
+        string = [self.class parseInsertText:op];
+        if (op.attributes.link.length) {
+          self.textView.linkTextAttributes = [string attributesAtIndex:0 effectiveRange:NULL];
+        }
       } else { // 换行段落
-        string = [self insertNewParagraph:cursor op:op];
+        string = [self.class parseInsertNewParagraph:self.attributedText at:cursor op:op];
       }
       [self.attributedText insertAttributedString:string atIndex:cursor];
       cursor += text.length;
@@ -72,9 +74,9 @@ static const char kGDOTextViewKey = 0;
 
     if (op.retain_p > 0) {
       if ([self.attributedText.string characterAtIndex:cursor] != '\n') {
-        [self retainText:cursor op:op];
+        [self.class retainText:self.attributedText at:cursor op:op];
       } else {
-        [self retainParagraph:cursor op:op];
+        [self.class retainParagraph:self.attributedText at:cursor op:op];
       }
       cursor += op.retain_p;
       continue;
@@ -105,53 +107,50 @@ static const char kGDOTextViewKey = 0;
   }
 }
 
-- (NSAttributedString *)insertText:(GDOPBDelta_Operation *)op {
++ (NSAttributedString *)parseInsertText:(GDOPBDelta_Operation *)op {
   NSDictionary *attr = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:nil];
-  if (op.attributes.link.length) {
-    self.textView.linkTextAttributes = attr;
-  }
   return [[NSAttributedString alloc] initWithString:op.insert attributes:attr];
 }
 
-- (void)retainText:(long)cursor op:(GDOPBDelta_Operation *)op {
-  NSArray *toRemove;
-  NSDictionary<NSString *, id> *attrs = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:&toRemove];
-  if (attrs.count) {
-    [self.attributedText addAttributes:attrs range:NSMakeRange(cursor, op.retain_p)];
-  }
-  for (NSString *key in toRemove) {
-    [self.attributedText removeAttribute:key range:NSMakeRange(cursor, op.retain_p)];
-  }
-}
-
-- (NSAttributedString *)insertNewParagraph:(long)cursor op:(GDOPBDelta_Operation *)op {
-  NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
++ (NSAttributedString *)parseInsertNewParagraph:(NSMutableAttributedString *)attributedText at:(long)cursor op:(GDOPBDelta_Operation *)op {
+  NSRange range = [attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor)];
   long lineStart = 0;
   if (range.location != NSNotFound) {
     lineStart = range.location + 1;
   }
-  [self.attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:@"\n"] atIndex:cursor];
+  [attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:@"\n"] atIndex:cursor];
   NSMutableParagraphStyle *paragraphStyle = nil;
-  if (cursor && lineStart < self.attributedText.length) {
-    paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
+  if (cursor && lineStart < attributedText.length) {
+    paragraphStyle = [attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
   }
   paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
   if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
-    [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart)];
+    [attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart)];
   }
   return [[NSAttributedString alloc] initWithString:@"\n" attributes:@{NSParagraphStyleAttributeName : paragraphStyle}];
 }
 
-- (void)retainParagraph:(long)cursor op:(GDOPBDelta_Operation *)op {
-  NSRange range = [self.attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor == 0 ? 0 : cursor - 1)];
++ (void)retainText:(NSMutableAttributedString *)attributedText at:(long)cursor op:(GDOPBDelta_Operation *)op {
+  NSArray *toRemove;
+  NSDictionary<NSString *, id> *attrs = [GDOAttributedStringUtil parseInlineAttributes:op.attributes toRemove:&toRemove];
+  if (attrs.count) {
+    [attributedText addAttributes:attrs range:NSMakeRange(cursor, op.retain_p)];
+  }
+  for (NSString *key in toRemove) {
+    [attributedText removeAttribute:key range:NSMakeRange(cursor, op.retain_p)];
+  }
+}
+
++ (void)retainParagraph:(NSMutableAttributedString *)attributedText at:(long)cursor op:(GDOPBDelta_Operation *)op {
+  NSRange range = [attributedText.string rangeOfString:@"\n" options:NSBackwardsSearch range:NSMakeRange(0, cursor == 0 ? 0 : cursor - 1)];
   long lineStart = 0;
   if (range.location != NSNotFound) {
     lineStart = range.location + 1;
   }
-  NSMutableParagraphStyle *paragraphStyle = [self.attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
+  NSMutableParagraphStyle *paragraphStyle = [attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
   paragraphStyle = paragraphStyle ? paragraphStyle.mutableCopy : [[NSMutableParagraphStyle alloc] init];
   if ([GDOAttributedStringUtil parseBlockAttributes:op.attributes style:paragraphStyle]) {
-    [self.attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
+    [attributedText addAttribute:NSParagraphStyleAttributeName value:paragraphStyle range:NSMakeRange(lineStart, cursor - lineStart + 1)];
   }
 }
 
@@ -159,7 +158,6 @@ static const char kGDOTextViewKey = 0;
   self.textView.attributedText = nil; // force to update
   self.textView.attributedText = self.attributedText;
 }
-
 
 + (void)publishLinkClick:(NSString *)url {
   NSString *topic = [NSString stringWithFormat:@"%@/actions/views", GDCBusProvider.clientId];
