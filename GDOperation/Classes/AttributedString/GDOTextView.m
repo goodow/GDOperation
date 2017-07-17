@@ -118,7 +118,6 @@ static const char kRichTextKey = 0;
   if (range.location != NSNotFound) {
     lineStart = range.location + 1;
   }
-  [attributedText insertAttributedString:[[NSAttributedString alloc] initWithString:@"\n"] atIndex:cursor];
   NSMutableParagraphStyle *paragraphStyle = nil;
   if (cursor && lineStart < attributedText.length) {
     paragraphStyle = [attributedText attribute:NSParagraphStyleAttributeName atIndex:lineStart longestEffectiveRange:nil inRange:NSMakeRange(lineStart, 1)];
@@ -156,6 +155,9 @@ static const char kRichTextKey = 0;
 
 - (void)update {
   self.textView.attributedText = nil; // force to update
+  if ([self.attributedText.string hasSuffix:@"\n"]) {
+    [self.attributedText deleteCharactersInRange:NSMakeRange(self.attributedText.string.length - 1, 1)];
+  }
   self.textView.attributedText = self.attributedText;
 }
 

@@ -44,16 +44,24 @@
   if (hasStringValue(NSBackgroundColorAttributeName, attributes.background)) {
     attrs[NSBackgroundColorAttributeName] = [self _colorFromHex:attributes.background];
   }
-  if (hasStringValue(nil, attributes.size) || hasStringValue(nil, attributes.font)) {
-    //    UIFont *font = [self.attributedText attribute:NSFontAttributeName atIndex:<#(NSUInteger)location#> effectiveRange:nil];
-    UIFont *font = [UIFont fontWithName:hasStringValue(nil, attributes.font) ? attributes.font : @"Helvetica" size:[self sizeFromString:attributes.size]];
-    attrs[NSFontAttributeName] = font;
+
+  BOOL bold = hasBoolValue(NSExpansionAttributeName, attributes.bold);
+  CGFloat size = 12;
+  if (hasStringValue(nil, attributes.size)) {
+    size = [self sizeFromString:attributes.size];
   }
+  if (hasStringValue(nil, attributes.font)) {
+    UIFont *font = [UIFont fontWithName:attributes.font size:size];
+    attrs[NSFontAttributeName] = font;
+    if (bold) {
+      attrs[NSExpansionAttributeName] = @0.2;
+    }
+  } else {
+    attrs[NSFontAttributeName] = [UIFont systemFontOfSize:size weight:bold ? UIFontWeightBold : UIFontWeightLight];
+  }
+
   if (hasStringValue(NSLinkAttributeName, attributes.link)) {
     attrs[NSLinkAttributeName] = attributes.link;
-  }
-  if (hasBoolValue(NSExpansionAttributeName, attributes.bold)) {
-    attrs[NSExpansionAttributeName] = @0.2;
   }
   if (hasBoolValue(NSObliquenessAttributeName, attributes.italic)) {
     attrs[NSObliquenessAttributeName] = @0.3;
@@ -188,7 +196,7 @@
 }
 
 + (CGFloat)sizeFromString:(NSString *)size {
-  CGFloat fontSize = 12;
+  CGFloat fontSize = 0;
   if ([size hasSuffix:@"px"]) {
     fontSize = [[size substringToIndex:size.length - @"px".length] floatValue];
   }

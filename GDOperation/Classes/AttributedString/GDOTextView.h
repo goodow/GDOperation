@@ -19,5 +19,5 @@
 
 + (void)retainParagraph:(NSMutableAttributedString *)attributedText at:(long)cursor op:(GDOPBDelta_Operation *)op;
 
-+ (void)publishLinkClick:(NSURL *)url;
++ (void)publishLinkClick:(NSString *)url;
 @end
