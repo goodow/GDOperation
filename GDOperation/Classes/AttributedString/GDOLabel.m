@@ -99,13 +99,20 @@ static const char kRichTextKey = 0;
 }
 
 + (NSAttributedString *)createImageEmbed:(GDOPBDelta_Operation *)op downloadCompletionHandler:(void (^)())completionHandler {
-  NSString *imageString = op.insertEmbed.image;
+  NSString *imgSrc = op.insertEmbed.image;
   NSTextAttachment *textAttachment = [[NSTextAttachment alloc] init];
-  UIImage *image = [UIImage imageNamed:imageString];
-  if (image) {
+  if ([imgSrc hasPrefix:@"file://"]) {
+    imgSrc = [imgSrc substringFromIndex:@"file://".length];
+    UIImage *image = nil;
+    if ([imgSrc hasPrefix:@"/"]) { // 相对于应用沙盒目录NSHomeDirectory()
+      imgSrc = [NSHomeDirectory() stringByAppendingPathComponent:imgSrc];
+      image = [UIImage imageWithContentsOfFile:imgSrc];
+    } else {
+      image = [UIImage imageNamed:imgSrc];
+    }
     textAttachment.image = image;
   } else {
-    NSURL *url = [NSURL URLWithString:imageString];
+    NSURL *url = [NSURL URLWithString:imgSrc];
     NSURLSessionDataTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:[NSURLRequest requestWithURL:url] completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error) {
           return;
