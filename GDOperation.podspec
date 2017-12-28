@@ -9,7 +9,7 @@
 Pod::Spec.new do |s|
   s.name             = 'GDOperation'
   s.version          = '0.1.0'
-  s.summary          = 'A short description of GDOperation.'
+  s.summary          = 'Collaborative Rich Text on iOS.'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -18,21 +18,21 @@ Pod::Spec.new do |s|
 #   * Finally, don't worry about the indent, CocoaPods strips it!
 
   s.description      = <<-DESC
-TODO: Add long description of the pod here.
+?? NSAttributedString ??????, ? JSON ????, ?????????????
                        DESC
 
   s.homepage         = 'https://github.com/goodow/GDOperation'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'Larry Tin' => 'dev@goodow.com' }
-  s.source           = { :git => 'https://github.com/<GITHUB_USERNAME>/GDOperation.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/goodow/GDOperation.git', :tag => "v#{s.version.to_s}" }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '8.0'
 
   s.subspec 'Core' do |sp|
     sp.dependency 'Protobuf', '~> 3.0'
-    sp.dependency 'GDChannel'
+    sp.dependency 'GDChannel', '~> 0.8'
 
     sp.requires_arc = ['GDOperation/Classes/**/*']
     sp.source_files = 'GDOperation/Classes/*', 'GDOperation/Classes/AttributedString/**/*', 'GDOperation/Generated/**/*'

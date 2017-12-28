@@ -163,7 +163,7 @@ enum EditorType {
 
 - (void)switchEditor {
   __weak GDORichTextPlaygroundViewController *weak = self;
-  UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"切换编辑器实现" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+  UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"切换富文本实现" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
   UIAlertAction *labelAction = [UIAlertAction actionWithTitle:@"UILabel" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
       [weak reloadEditor:UI_Label title:action.title];
   }];
